@@ -20,6 +20,10 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
   config.active_record.attributes_for_inspect = [ :id ]
 
-  config.action_cable.allowed_request_origins = [ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "localhost:3000")]
+  config.action_cable.allowed_request_origins = [
+    "corkboard-backend-production.up.railway.app",
+    ENV.fetch("RAILWAY_PUBLIC_DOMAIN", nil),
+    "localhost:3000"
+  ].compact
   config.action_cable.mount_path = "/cable"
 end
