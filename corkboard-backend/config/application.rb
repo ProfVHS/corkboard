@@ -18,5 +18,7 @@ module CorkboardBackend
     config.session_store :cookie_store, key: '_corkboard-session'
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use config.session_store, config.session_options
+
+    config.action_controller.default_url_options = { host: ENV.fetch('APP_HOST', 'http://localhost:3000'), protocol: 'https' }
   end
 end

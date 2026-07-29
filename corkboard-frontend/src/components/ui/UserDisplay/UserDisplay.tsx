@@ -9,7 +9,7 @@ type UserDisplayProps = {
 export const UserDisplay = ({user}: UserDisplayProps) => {
     return (
         <div className="user-display">
-            <UserAvatar username={user.username}/>
+            <UserAvatar username={user.username} avatarUrl={user.avatar_url}/>
             <span>{user.username}</span>
         </div>
     )

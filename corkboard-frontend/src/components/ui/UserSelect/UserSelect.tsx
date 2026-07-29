@@ -16,7 +16,7 @@ interface UserSelectProps {
 export const UserSelect = ({ taskId, taskUser, readonly = false }: UserSelectProps) => {
     const [showUserSelection, setShowUserSelection] = useState<boolean>(false);
     const userSelectModalRef = useRef<HTMLDivElement>(null);
-    const [users, setUsers] = useState<{ id: number; username: string }[]>([]);
+    const [users, setUsers] = useState<{ id: number; username: string; avatar_url: string }[]>([]);
     const workspace = useWorkspaceStore((state) => state.workspace);
     const updateTaskUser = useReleaseBoardStore((state) => state.updateTaskUser);
 
@@ -55,7 +55,7 @@ export const UserSelect = ({ taskId, taskUser, readonly = false }: UserSelectPro
         <div className="user-select">
             {taskUser ? (
                 <div onClick={handleOpenUserSelection}>
-                    <UserAvatar username={taskUser.username} />
+                    <UserAvatar username={taskUser.username} avatarUrl={taskUser.avatar_url} />
                 </div>
             ) : (
                 <Button color="outlined" size="small" variant="icon" icon="userCircle" onClick={handleOpenUserSelection} />
@@ -65,7 +65,7 @@ export const UserSelect = ({ taskId, taskUser, readonly = false }: UserSelectPro
                 <div className="user-select__modal" ref={userSelectModalRef}>
                     {users.map((user) => (
                         <div key={user.id} className="item" onClick={() => handleAssignUserToTask(user.id)}>
-                            <UserAvatar username={user.username} />
+                            <UserAvatar username={user.username} avatarUrl={user.avatar_url} />
                             <span>{user.username}</span>
                         </div>
                     ))}

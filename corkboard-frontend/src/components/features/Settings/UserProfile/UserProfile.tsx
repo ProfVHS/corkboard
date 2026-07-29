@@ -6,11 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/auth/useAuth.ts";
 import { useState } from "react";
 import type { TaskDisplayType } from "../../../../types/TaskDisplayType.ts";
+import { UserAvatar } from "../../../ui/UserAvatar/UserAvatar.tsx";
+import { CropAvatarModal } from "../../CropModal/CropModal.tsx";
 
 export const UserProfile = () => {
     const navigate = useNavigate();
     const { user, setUser } = useAuth();
     const [username, setUsername] = useState<string>(user ? user.username : "");
+    const [avatar, setAvatar] = useState<string | null>(null);
 
     const handleLogout = () => {
         api.delete("/logout");
@@ -32,8 +35,38 @@ export const UserProfile = () => {
         });
     };
 
+    const handleAvatarSave = (value: Blob) => {
+        if (!user) return;
+
+        const formData = new FormData();
+
+        formData.append("user[avatar]", value);
+
+        console.log(formData);
+
+        api.put(`users/${user.id}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }).then((response) => {
+            setUser(response.data);
+        });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !file.type.startsWith("image/")) return;
+
+        const reader = new FileReader();
+        reader.onload = () => setAvatar(reader.result as string);
+        reader.readAsDataURL(file);
+
+        e.target.value = "";
+    };
+
     return (
         <div className="user-profile">
+            {avatar && <CropAvatarModal avatarUrl={avatar} onConfirm={handleAvatarSave} onClose={() => setAvatar(null)} />}
             <span className="user-profile__title">My settings</span>
 
             <div className="user-profile__section">
@@ -43,7 +76,8 @@ export const UserProfile = () => {
                 </div>
                 <div className="user-profile__section-content">
                     <div className="avatar-text">Avatar</div>
-                    <div className="avatar">A</div>
+                    {user && <UserAvatar username={user.username} avatarUrl={user.avatar_url} />}
+                    <input type="file" onChange={(e) => handleFileChange(e)} />
                     <LabeledInput
                         label="Full Name"
                         value={username}

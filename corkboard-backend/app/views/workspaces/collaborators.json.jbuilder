@@ -1,6 +1,7 @@
 json.collaborators do
   json.array! @users do |user|
     json.extract! user, :id, :username
+    json.avatar_url user.avatar_url
   end
 end
 

@@ -1,14 +1,11 @@
-import "./UserAvatar.scss"
+import "./UserAvatar.scss";
 
 type UserAvatarProps = {
-    username: string
-}
-export const UserAvatar = ({username}: UserAvatarProps) => {
-    const usernameFirstLetter = username[0].toUpperCase()
+    username: string;
+    avatarUrl?: string;
+};
+export const UserAvatar = ({ username, avatarUrl }: UserAvatarProps) => {
+    const usernameFirstLetter = username[0].toUpperCase();
 
-    return (
-        <div className="user-avatar">
-            {usernameFirstLetter}
-        </div>
-    )
-}
+    return <div className="user-avatar">{avatarUrl ? <img src={avatarUrl} alt={usernameFirstLetter} /> : usernameFirstLetter}</div>;
+};

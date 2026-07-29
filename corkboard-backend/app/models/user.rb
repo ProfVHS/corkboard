@@ -25,6 +25,7 @@
 #
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
+  include Rails.application.routes.url_helpers
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable,
@@ -37,11 +38,13 @@ class User < ApplicationRecord
               with: /\A[a-zA-Z0-9_-]+\z/,
               message: "cannot contain spaces"
             }
-  validates :password, presence: true, length: { minimum: 6 }
+  validates :password, presence: true, length: { minimum: 6 }, if: -> { new_record? || password.present? }
   has_and_belongs_to_many :workspaces
   has_many :documents, foreign_key: :owner_id
   has_one :user_preference
   belongs_to :last_workspace, class_name: "Workspace", optional: true
+
+  has_one_attached :avatar
 
   after_create :create_workspace
   after_create :create_preference
@@ -56,6 +59,14 @@ class User < ApplicationRecord
 
   def email
     self.username
+  end
+
+  def avatar_url
+    if self.avatar.attached?
+      "#{Rails.application.config.action_controller.default_url_options[:host]}#{Rails.application.routes.url_helpers.rails_blob_path(self.avatar, only_path: true)}"
+    else
+      nil
+    end
   end
 
   private

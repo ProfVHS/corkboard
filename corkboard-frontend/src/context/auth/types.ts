@@ -1,11 +1,13 @@
 export type User = {
     id: number;
     username: string;
+    avatar_url: string
 };
 
 export type UserSettings = {
     id: number;
     username: string;
+    avatar_url: string
     preferences: UserPreferences;
 };
 

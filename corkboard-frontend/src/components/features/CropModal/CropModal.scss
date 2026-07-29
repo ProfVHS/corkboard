@@ -1,0 +1,86 @@
+@use '../../../global/colors' as colors;
+.crop-modal {
+  .modal-body{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  &__panel {
+    width: 100%;
+    max-width: 384px;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #0f172a;
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    color: #94a3b8;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease;
+
+    &:hover {
+      color: #475569;
+      background: #f1f5f9;
+    }
+  }
+
+  &__stage {
+    position: relative;
+    overflow: hidden;
+    touch-action: none;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: none;
+    user-select: none;
+    z-index: 1;
+  }
+
+  &__zoom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  &__zoom-slider {
+    width: 100%;
+    accent-color: colors.$blue;
+  }
+
+  &__hint {
+    font-size: 1rem;
+    text-align: center;
+  }
+}
