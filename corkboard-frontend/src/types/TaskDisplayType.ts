@@ -1,1 +1,1 @@
-export type TaskDisplayType = "MODAL" | "SIDEBAR" | null;
+export type TaskDisplayType = "modal" | "sidebar" | null;

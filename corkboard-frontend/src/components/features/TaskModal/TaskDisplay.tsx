@@ -10,7 +10,7 @@ const TaskDisplay = () => {
 
     if (!isOpen || !taskId || !user) return null;
 
-    return <>{user.preferences.task_display === "SIDEBAR" ? <TaskSidebar taskId={taskId} /> : <TaskModal taskId={taskId} />}</>;
+    return <div className="task-display">{user.preferences.task_display === "sidebar" ? <TaskSidebar taskId={taskId} /> : <TaskModal taskId={taskId} />}</div>;
 };
 
 export default TaskDisplay;

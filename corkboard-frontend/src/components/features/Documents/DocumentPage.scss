@@ -8,6 +8,10 @@
   flex-direction: column;
   gap: 20px;
 
+  &.hidden {
+    display: none;
+  }
+
   &__title {
     font-size: 42px;
     border: none;

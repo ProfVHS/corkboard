@@ -1,56 +1,69 @@
-import './WorkspaceGeneral.scss';
-import {Input} from '../../../ui/Input/Input.tsx';
-import {useNavigate, useParams} from 'react-router-dom';
-import {api} from '../../../../api/api.ts';
-import {Button} from '../../../ui/Button/Button.tsx';
-import * as yup from 'yup'
-import {useForm} from "react-hook-form";
-import {yupResolver} from "@hookform/resolvers/yup";
-import {useAuth} from "../../../../context/auth/useAuth.ts";
-import {useWorkspaceStore} from "../../../../store/workspaceStore.ts";
+import "./WorkspaceGeneral.scss";
+import { Input } from "../../../ui/Input/Input.tsx";
+import { useNavigate, useParams } from "react-router-dom";
+import { api } from "../../../../api/api.ts";
+import { Button } from "../../../ui/Button/Button.tsx";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuth } from "../../../../context/auth/useAuth.ts";
+import { useWorkspaceStore } from "../../../../store/workspaceStore.ts";
+import Loading from "../../../ui/Loading/Loading.tsx";
 
-const schema = yup.object({
-    id: yup.number(),
-    name: yup.string().required("You have to enter a workspace name!")
-}).required()
+const schema = yup
+    .object({
+        id: yup.number(),
+        name: yup.string().required("You have to enter a workspace name!"),
+    })
+    .required();
 
-type FormData = yup.InferType<typeof schema>
+type FormData = yup.InferType<typeof schema>;
 
 export const WorkspaceGeneral = () => {
-    const {workspaceId} = useParams();
-    const {user} = useAuth()
+    const { workspaceId } = useParams();
+    const { user } = useAuth();
     const navigate = useNavigate();
-    const setWorkspace = useWorkspaceStore(state => state.setWorkspace)
+    const setWorkspace = useWorkspaceStore((state) => state.setWorkspace);
 
-    const {register, handleSubmit, formState: {isDirty, isLoading}, getValues, reset} = useForm({
+    const {
+        register,
+        handleSubmit,
+        formState: { isDirty, isLoading },
+        getValues,
+        reset,
+    } = useForm({
         resolver: yupResolver(schema),
         defaultValues: async () => {
-            const response = await api.get(`/workspaces/${workspaceId}`)
-            return await response.data
-        }
-    })
+            const response = await api.get(`/workspaces/${workspaceId}`);
+            return await response.data;
+        },
+    });
 
-    const workspaceOwner = getValues('owner')?.id === user?.id;
+    const workspaceOwner = getValues("owner")?.id === user?.id;
 
     const handleDeleteWorkspace = () => {
-        const workspaceId = getValues("id")
+        const workspaceId = getValues("id");
         api.delete(`/workspaces/${workspaceId}`);
         navigate(`/workspaces/${workspaceId}/current_release`);
     };
 
     const onSubmit = (workspace: FormData) => {
-        api.put(`/workspaces/${workspace.id}`, {workspace}).then((res) => {
-            reset(res.data)
-            setWorkspace(res.data)
-        })
-    }
+        api.put(`/workspaces/${workspace.id}`, { workspace }).then((res) => {
+            reset(res.data);
+            setWorkspace(res.data);
+        });
+    };
+
+    if (isLoading) return <Loading overlay={true} />;
 
     return (
         <div className="workspace-general">
             <div className="workspace-general__title">
                 Workspace settings
                 <div className="workspace-general__buttons">
-                    <Button color="primary" disabled={!isDirty} onClick={handleSubmit(onSubmit)}>Save</Button>
+                    <Button color="primary" disabled={!isDirty} onClick={handleSubmit(onSubmit)}>
+                        Save
+                    </Button>
                 </div>
             </div>
 
@@ -63,7 +76,7 @@ export const WorkspaceGeneral = () => {
 
                 <div className="workspace-general__setting">
                     <span className="workspace-general__label">Name</span>
-                    <Input defaultValue={!isLoading ? getValues("name") : ""} register={register("name")}/>
+                    <Input defaultValue={!isLoading ? getValues("name") : ""} register={register("name")} />
                 </div>
             </div>
 

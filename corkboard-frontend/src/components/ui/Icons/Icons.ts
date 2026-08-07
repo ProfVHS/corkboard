@@ -4,20 +4,26 @@ import bookmarks from "./svgs/bookmarks.svg?react";
 import appLogo from "./svgs/app-logo.svg?react";
 import edit from "./svgs/edit.svg?react";
 import trash from "./svgs/trash.svg?react";
-import userCircle from "./svgs/user-circle.svg?react";
+import circleUser from "./svgs/circle-user.svg?react";
 import dots from "./svgs/dots.svg?react";
-import xCircle from "./svgs/x-circle.svg?react";
-import exclamationMark from "./svgs/exclamationMark.svg?react";
+import circleX from "./svgs/circle-x.svg?react";
+import exclamationMark from "./svgs/exclamation-mark.svg?react";
 import gear from "./svgs/gear.svg?react";
 import users from "./svgs/users.svg?react";
-import circleArrowRight from "./svgs/circleArrowRight.svg?react";
+import circleArrowRight from "./svgs/circle-arrow-right.svg?react";
 import boxArrowDown from "./svgs/box-arrow-down.svg?react";
 import boxArrowUp from "./svgs/box-arrow-up.svg?react";
 import workspaces from "./svgs/workspaces.svg?react";
-import plusCircle from "./svgs/plus-circle.svg?react";
+import circlePlus from "./svgs/circle-plus.svg?react";
 import bell from "./svgs/bell.svg?react";
 import doorOpen from "./svgs/door-open.svg?react";
 import document from "./svgs/document.svg?react";
+import priority from "./svgs/priority.svg?react";
+import circleStatus from "./svgs/circle-status.svg?react";
+import info from "./svgs/info.svg?react";
+import warning from "./svgs/warning.svg?react";
+import success from "./svgs/success.svg?react";
+import close from "./svgs/close.svg?react";
 
 import bold from "./svgs/bold.svg?react";
 import italic from "./svgs/italic.svg?react";
@@ -32,9 +38,9 @@ export const icons = {
     appLogo,
     edit,
     trash,
-    userCircle,
+    circleUser,
     dots,
-    xCircle,
+    circleX,
     exclamationMark,
     gear,
     users,
@@ -42,7 +48,8 @@ export const icons = {
     boxArrowDown,
     boxArrowUp,
     workspaces,
-    plusCircle,
+    circlePlus,
+    circleStatus,
     bell,
     doorOpen,
     document,
@@ -51,4 +58,9 @@ export const icons = {
     underline,
     strike,
     code,
+    priority,
+    info,
+    warning,
+    success,
+    close,
 };

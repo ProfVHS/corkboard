@@ -34,7 +34,7 @@ class WorkspacesController < ApplicationController
 
   def invite_user
     @user = User.find_by(username: params[:username])
-    return render json: { error: "Username not found!" } if @user.nil?
+    return render json: { message: "Username not found!" } if @user.nil?
 
     already_in_workspace = UsersWorkspaces.find_by(workspace_id: params[:id], user_id: @user&.id)
     return render json: { message: "Username already in workspace!" } if already_in_workspace
@@ -43,6 +43,7 @@ class WorkspacesController < ApplicationController
     return render json: { message: "Username already invited!" } if already_invited
 
     WorkspaceInvitation.create!(invited_user_id: @user&.id, workspace_id: params[:id], invited_by_user_id: current_user.id)
+    render json: { message: "Username successfully invited!", status: "success" }
   end
 
   def invitation

@@ -4,11 +4,7 @@
   min-width: 60dvw;
   max-width: 60dvw;
 
-  &-hidden {
-    display: none;
-  }
-
-  &-content {
+  .task-editor {
     width: 100%;
   }
 
@@ -24,83 +20,5 @@
 
     scrollbar-width: thin;
     scrollbar-color: rgba(#222222, 0.7) transparent;
-  }
-
-  &__name {
-    width: 100%;
-    flex-shrink: 0;
-    field-sizing: content;
-    overflow-y: hidden;
-    resize: none;
-    font-size: 30px;
-    border: none;
-    outline: none;
-    background: none;
-  }
-
-  &__properties {
-    width: 100%;
-
-    display: flex;
-    gap: 120px;
-
-    border-bottom: 1px solid #222222;
-
-    padding: 20px 0;
-    margin: 10px 0 20px 0;
-
-    .owner {
-      display: flex;
-      gap: 10px;
-
-      cursor: pointer;
-    }
-
-    .status {
-      color: #ffffff;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 5px;
-
-      padding: 2px 5px;
-      border-radius: 5px;
-
-      cursor: not-allowed;
-
-      .dot {
-        width: 10px;
-        height: 10px;
-
-        border-radius: 50%;
-
-        background-color: rgba(0, 0, 0, 0.4);
-      }
-
-      &.adjustments {
-        background-color: #EF4444;
-      }
-
-      &.todo, &.backlog {
-        background-color: #353535;
-      }
-
-      &.in_progress {
-        background-color: #0084FF;
-      }
-
-      &.review_pending {
-        background-color: #F59E0B;
-      }
-
-      &.testing {
-        background-color: #14B8A6;
-      }
-
-      &.accepted {
-        background-color: #22C55E;
-      }
-    }
   }
 }

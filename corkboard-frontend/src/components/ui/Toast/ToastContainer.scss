@@ -1,0 +1,91 @@
+@use '../../../global/colors' as colors;
+
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  pointer-events: none;
+  z-index: 9999;
+
+  .toast {
+    min-width: 400px;
+    display: flex;
+    align-items: center;
+
+    padding: 16px;
+    border-radius: 5px;
+    border-left: 6px solid;
+
+    font-weight: bold;
+    pointer-events: all;
+
+    animation: slideIn 0.3s ease-out;
+
+    &.success {
+      background-color: #111F12;
+      color: #4FAE55;
+      border-color: #4FAE55;
+    }
+
+    &.info {
+      background-color: #0A1C29;
+      color: #2497F4;
+      border-color: #2497F4;
+    }
+
+    &.warning {
+      background-color: #2A1C05;
+      color: #FA9A00;
+      border-color: #FA9A00;
+    }
+
+    &.error {
+      background-color: #290F0D;
+      color: #F34434;
+      border-color: #F34434;
+    }
+
+    .content {
+      width: 100%;
+
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .icon {
+        width: 30px;
+      }
+    }
+
+    .close {
+      background: none;
+      color: inherit;
+
+      margin-left: auto;
+
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+
+      .icon {
+        width: 20px;
+      }
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

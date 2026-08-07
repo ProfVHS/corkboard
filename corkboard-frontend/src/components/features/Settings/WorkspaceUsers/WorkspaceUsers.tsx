@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { Table } from "../../../ui/Table/Table.tsx";
 import { UserDisplay } from "../../../ui/UserDisplay/UserDisplay.tsx";
 import type { UserPreferences } from "../../../../context/auth/types.ts";
+import Loading from "../../../ui/Loading/Loading.tsx";
 
 type User = {
     id: number;
@@ -20,14 +21,18 @@ export const WorkspaceUsers = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [invitedUsers, setInvitedUsers] = useState<User[]>([]);
     const [showInviteModal, setShowInviteModal] = useState(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const { workspaceId } = useParams();
 
     useEffect(() => {
-        api.get(`workspaces/${localStorage.getItem("workspace_id")}/collaborators`).then((res) => {
+        api.get(`workspaces/${workspaceId}/collaborators`).then((res) => {
             setUsers(res.data.collaborators);
             setInvitedUsers(res.data.invited_users);
+            setLoading(false);
         });
     }, []);
+
+    if (loading) return <Loading overlay={true} />;
 
     return (
         <div className="workspace-users">

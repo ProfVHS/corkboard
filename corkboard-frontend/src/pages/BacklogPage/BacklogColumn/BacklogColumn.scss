@@ -13,12 +13,9 @@
   border: 1px solid colors.$border-color;
   border-radius: 0.5rem;
 
-  .icon {
-    width: 2rem;
-  }
-
   .board-column{
     width: 100% !important;
+    max-height: unset;
   }
 
   &__header {
@@ -28,6 +25,10 @@
     padding: 1rem;
 
     border-bottom: 1px solid colors.$border-color;
+
+    .icon {
+      width: 30px;
+    }
   }
 
   &__title{

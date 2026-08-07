@@ -9,11 +9,10 @@ interface TaskStatusSelectProps {
     taskStatus: string;
 }
 
-const statuses = ["backlog", "adjustments", "todo", "in_progress", "review_pending", "testing", "accepted"];
+const statuses = ["adjustments", "todo", "in_progress", "review_pending", "testing", "accepted"];
 
 const TaskStatusSelect = ({ taskId, taskStatus }: TaskStatusSelectProps) => {
     const [showStatusSelect, setShowStatusSelect] = useState<boolean>(false);
-    const moveToBacklog = useReleaseBoardStore((state) => state.moveToBacklog);
     const moveTaskBetweenColumns = useReleaseBoardStore((state) => state.moveTaskBetweenColumns);
     const taskStatusModalRef = useRef<HTMLDivElement | null>(null);
     const taskStatusButtonRef = useRef<HTMLDivElement | null>(null);
@@ -24,12 +23,7 @@ const TaskStatusSelect = ({ taskId, taskStatus }: TaskStatusSelectProps) => {
             return;
         }
 
-        if (status === "backlog") {
-            moveToBacklog(taskId);
-        } else {
-            moveTaskBetweenColumns(taskId, taskStatus, status);
-        }
-
+        moveTaskBetweenColumns(taskId, taskStatus, status);
         setShowStatusSelect(false);
     };
 
@@ -55,8 +49,8 @@ const TaskStatusSelect = ({ taskId, taskStatus }: TaskStatusSelectProps) => {
     }, []);
 
     return (
-        <div className="task-status">
-            <div ref={taskStatusButtonRef} className={classNames("status", taskStatus)} onClick={() => setShowStatusSelect(true)}>
+        <div className="task-status" onClick={() => setShowStatusSelect(true)}>
+            <div ref={taskStatusButtonRef} className={classNames("status", taskStatus)}>
                 <div className="dot"></div>
                 <span>{upperCase(taskStatus)}</span>
             </div>

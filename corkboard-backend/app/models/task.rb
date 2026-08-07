@@ -5,6 +5,7 @@
 #  id           :bigint           not null, primary key
 #  name         :string
 #  order        :integer
+#  priority     :string
 #  status       :string
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
@@ -41,6 +42,12 @@ class Task < ApplicationRecord
     review_pending: "review_pending",
     testing: "testing",
     accepted: "accepted"
+  }
+
+  enum :priority, {
+    medium: "medium",
+    high: "high",
+    urgent: "urgent",
   }
 
   def clear_release_id_for_backlog

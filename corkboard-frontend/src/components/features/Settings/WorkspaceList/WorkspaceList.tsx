@@ -7,10 +7,12 @@ import { Button } from "../../../ui/Button/Button.tsx";
 import { useAuth } from "../../../../context/auth/useAuth.ts";
 import { WorkspaceDisplay } from "../../../ui/WorkspaceDisplay/WorkspaceDisplay.tsx";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../../ui/Loading/Loading.tsx";
 
 export const WorkspaceList = () => {
     const [workspaces, setWorkspaces] = useState<WorkspaceType[]>([]);
     const { user } = useAuth();
+    const [loading, setLoading] = useState<boolean>(true);
     const navigate = useNavigate();
 
     const handleOpenWorkspaceSettings = (id: number) => {
@@ -20,8 +22,11 @@ export const WorkspaceList = () => {
     useEffect(() => {
         api.get("/workspaces").then((res) => {
             setWorkspaces(res.data);
+            setLoading(false);
         });
     }, []);
+
+    if (loading) return <Loading overlay={true} />;
 
     return (
         <div className="workspace-list">

@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_194938) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_06_185759) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -71,6 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_194938) do
     t.datetime "created_at", null: false
     t.string "name"
     t.integer "order"
+    t.string "priority"
     t.integer "release_id"
     t.string "status"
     t.datetime "updated_at", null: false
@@ -95,11 +97,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_194938) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.string "role", default: "user", null: false
     t.datetime "updated_at", null: false
-    t.string "username"
+    t.citext "username"
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["last_workspace_id"], name: "index_users_on_last_workspace_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   create_table "users_workspaces", id: false, force: :cascade do |t|

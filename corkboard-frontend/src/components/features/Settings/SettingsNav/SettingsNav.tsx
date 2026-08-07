@@ -31,7 +31,7 @@ export const SettingsNav = () => {
 
                 <SubNavbar.Body>
                     <NavLink className="settings-nav__tab" to="/settings/user/profile">
-                        <Icon icon="userCircle" />
+                        <Icon icon="circleUser" />
                         Preferences
                     </NavLink>
                     <NavLink className="settings-nav__tab" to="/settings/user/workspaces">

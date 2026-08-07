@@ -4,23 +4,23 @@ import { Navbar } from "./Navbar/Navbar.tsx";
 import Loading from "../ui/Loading/Loading.tsx";
 
 type ProtectedRouteProps = {
+    role?: string;
     children: React.ReactNode;
 };
 
-export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { loading } = useAuth();
+export const ProtectedRoute = ({ role = "user", children }: ProtectedRouteProps) => {
+    const { loading, user } = useAuth();
     const token = localStorage.getItem("token");
 
     if (!token) {
         return <Navigate to="/" replace />;
     }
 
-    if (loading)
-        return (
-            <div style={{ width: "100vw", height: "100vh" }}>
-                <Loading />
-            </div>
-        );
+    if (loading) return <Loading overlay={true} />;
+
+    if (user?.role !== role) {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <>

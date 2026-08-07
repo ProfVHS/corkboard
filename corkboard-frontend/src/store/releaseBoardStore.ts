@@ -138,6 +138,7 @@ export const useReleaseBoardStore = create<ReleaseBoardStore>((set, get) => ({
             workspace_id: workspaceId || null,
             status: columnId,
             user: null,
+            priority: null,
         };
         set((state) => {
             return {

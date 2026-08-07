@@ -1,22 +1,19 @@
-import './WorkspaceMenu.scss';
-import {WorkspaceMenuItem} from './WorkspaceMenuItem.tsx';
-import type {WorkspaceType} from '../../../types/WorkspaceType.ts';
-import {useNavigate} from 'react-router-dom';
-import {useWorkspaceStore} from '../../../store/workspaceStore.ts';
-import {Button} from '../../ui/Button/Button.tsx';
-import {forwardRef} from 'react';
-import {useWorkspaceMenuStore} from '../../../store/workspaceMenuStore.ts';
-import * as _ from 'lodash'
+import "./WorkspaceMenu.scss";
+import { WorkspaceMenuItem } from "./WorkspaceMenuItem.tsx";
+import type { WorkspaceType } from "../../../types/WorkspaceType.ts";
+import { useNavigate } from "react-router-dom";
+import { useWorkspaceStore } from "../../../store/workspaceStore.ts";
+import { Button } from "../../ui/Button/Button.tsx";
+import { forwardRef } from "react";
+import { useWorkspaceMenuStore } from "../../../store/workspaceMenuStore.ts";
+import * as _ from "lodash";
 
 type WorkspaceMenuProps = {
     workspaces: WorkspaceType[];
     handleWorkspaceCreate: () => void;
 };
 
-export const WorkspaceMenu = forwardRef<HTMLDivElement, WorkspaceMenuProps>(({
-                                                                                 workspaces,
-                                                                                 handleWorkspaceCreate
-                                                                             }, ref) => {
+export const WorkspaceMenu = forwardRef<HTMLDivElement, WorkspaceMenuProps>(({ workspaces, handleWorkspaceCreate }, ref) => {
     const workspace = useWorkspaceStore((state) => state.workspace);
     const setMenuOpen = useWorkspaceMenuStore((state) => state.setOpen);
     const navigate = useNavigate();
@@ -31,17 +28,20 @@ export const WorkspaceMenu = forwardRef<HTMLDivElement, WorkspaceMenuProps>(({
         navigate(`/settings/workspace/${workspace?.id}/users`);
     };
 
-    const groupedWorkspaces = _.groupBy(workspaces, 'owner.username')
+    const groupedWorkspaces = _.groupBy(workspaces, "owner.username");
+    const memberCount = workspace!.number_of_members;
+    const memberLabel = memberCount === 1 ? "member" : "members";
 
     return (
         <div className="workspace-menu" ref={ref}>
             <div className="workspace-menu__header">
-                <div
-                    className="workspace-menu__logo">{workspace && (!workspace || !workspace.logo) ? workspace!.name[0].toUpperCase() : 'Logo'}</div>
+                <div className="workspace-menu__logo">{workspace && (!workspace || !workspace.logo) ? workspace!.name[0].toUpperCase() : "Logo"}</div>
 
                 <div className="workspace-menu__info">
                     <span className="workspace-menu__info-name">{workspace && workspace.name}</span>
-                    <span className="workspace-menu__info-members">2 members</span>
+                    <span className="workspace-menu__info-members">
+                        {memberCount} {memberLabel}
+                    </span>
                 </div>
             </div>
 
@@ -61,17 +61,21 @@ export const WorkspaceMenu = forwardRef<HTMLDivElement, WorkspaceMenuProps>(({
 
                         <div className="workspace-menu__workspaces">
                             {Object.keys(groupedWorkspaces).map((username) => {
-                                const workspaces = groupedWorkspaces[username]
+                                const workspaces = groupedWorkspaces[username];
                                 return (
                                     <>
                                         <span className="workspace-menu__owner">@{username}</span>
-                                        {workspaces.map(workspace => (
-                                            <WorkspaceMenuItem key={workspace.id} id={workspace.id}
-                                                               name={workspace.name}
-                                                               owner={workspace.owner}/>
+                                        {workspaces.map((workspace) => (
+                                            <WorkspaceMenuItem
+                                                key={workspace.id}
+                                                id={workspace.id}
+                                                name={workspace.name}
+                                                owner={workspace.owner}
+                                                number_of_members={workspace.number_of_members}
+                                            />
                                         ))}
                                     </>
-                                )
+                                );
                             })}
                         </div>
                     </>

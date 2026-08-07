@@ -9,10 +9,11 @@ export type UserSettings = {
     username: string;
     avatar_url: string
     preferences: UserPreferences;
+    role: "user" | "superadmin";
 };
 
 export type UserPreferences = {
-    task_display: "MODAL" | "SIDEBAR";
+    task_display: "modal" | "sidebar";
 };
 
 export type AuthContextType = {

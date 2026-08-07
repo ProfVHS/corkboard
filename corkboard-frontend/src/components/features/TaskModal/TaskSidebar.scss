@@ -1,13 +1,4 @@
 .task-sidebar {
-  &-overlay {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-
   width: 600px;
   height: 100%;
   padding: 40px 40px 200px;
@@ -19,46 +10,15 @@
   right: 0;
 
   overflow-y: auto;
-  animation: slideIn 0.2s ease-out forwards;
+  animation: slideIn 0.15s ease-out forwards;
 
-  &-closing {
-    animation: slideOut 0.2s ease-out forwards;
-  }
-
-  &-hidden {
-    display: none;
-  }
-
-  &__name {
-    width: 100%;
-    min-height: 80px;
-    overflow-y: auto;
-    resize: none;
-    field-sizing: content;
-
-    font-size: 30px;
-    border: none;
-    outline: none;
-    background: none;
-  }
-
-  &__properties {
-    width: 100%;
-
+  &-overlay {
+    position: fixed;
+    inset: 0;
     display: flex;
-    gap: 120px;
-
-    border-bottom: 1px solid #222222;
-
-    padding: 20px 0;
-    margin: 10px 0 20px 0;
-
-    .owner {
-      display: flex;
-      gap: 10px;
-
-      cursor: pointer;
-    }
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
   }
 }
 
@@ -68,14 +28,5 @@
   }
   to {
     transform: translateX(0);
-  }
-}
-
-@keyframes slideOut {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(100%);
   }
 }

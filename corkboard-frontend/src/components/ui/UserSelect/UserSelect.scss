@@ -2,6 +2,17 @@
 .user-select {
   position: relative;
 
+  .user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .button {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
   &__modal {
     width: 200px;
     max-height: 250px;
@@ -12,12 +23,11 @@
 
     box-sizing: border-box;
     position: absolute;
-    top: 40px;
+    top: 35px;
     padding: 0.5rem 0.25rem;
     border-radius: 5px;
 
-    background-color: colors.$dark-bg;
-    border: 1px solid colors.$border-color;
+    background-color: #1b1b1b;
 
     overflow: auto;
 

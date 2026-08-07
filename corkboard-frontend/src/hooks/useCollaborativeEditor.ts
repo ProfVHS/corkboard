@@ -54,6 +54,11 @@ export const useCollaborativeEditor = ({ user }: useCollaborativeEditorProps) =>
                 },
             }),
         ],
+        editorProps: {
+            attributes: {
+                spellcheck: "false",
+            },
+        },
     });
 
     return { editor, isLoading };

@@ -10,6 +10,7 @@ export type TaskType = {
     workspace_id: number | null;
     status: string;
     order: number;
+    priority: string | null;
     user: User | null;
     actor_id?: number;
 };

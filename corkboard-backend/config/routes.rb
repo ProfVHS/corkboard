@@ -14,8 +14,11 @@ Rails.application.routes.draw do
              },
              defaults: { format: :json }
 
-  get "users/me", to: "users#me"
-  put "users/:id", to: "users#update"
+  resources :users do
+    collection do
+      get :me
+    end
+  end
 
   put "user_preferences", to: "user_preferences#update"
 

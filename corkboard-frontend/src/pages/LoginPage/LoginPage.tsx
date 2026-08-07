@@ -14,14 +14,20 @@ type Inputs = {
 
 export const LoginPage = () => {
     const { register, handleSubmit } = useForm<Inputs>();
-    const { setToken } = useAuth();
+    const { setToken, setUser } = useAuth();
     const navigate = useNavigate();
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         api.post("/login", { user: data }).then((res) => {
             localStorage.setItem("token", res.data.token);
             setToken(res.data.token);
-            navigate(`/workspaces/${res.data.workspace_id}/current_release`);
+            setUser(res.data.data);
+
+            if (res.data.data.role === "superadmin") {
+                navigate(`/superadmin`);
+            } else {
+                navigate(`/workspaces/${res.data.workspace_id}/current_release`);
+            }
         });
     };
 

@@ -12,6 +12,7 @@ gem "jsonapi-serializer"
 gem "annotaterb"
 gem "redis"
 gem "dotenv-rails"
+gem "cancancan"
 
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

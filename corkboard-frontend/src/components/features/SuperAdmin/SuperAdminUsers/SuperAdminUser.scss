@@ -1,0 +1,26 @@
+.superadmin-user {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  .input {
+    width: 40%;
+  }
+
+  .header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+
+    padding: 20px;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    padding: 50px 100px;
+  }
+}

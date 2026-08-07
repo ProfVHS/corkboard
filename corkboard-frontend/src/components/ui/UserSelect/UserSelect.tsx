@@ -10,10 +10,10 @@ import { useReleaseBoardStore } from "../../../store/releaseBoardStore.ts";
 interface UserSelectProps {
     taskId: number;
     taskUser: User | null;
-    readonly?: boolean;
+    variant?: string;
 }
 
-export const UserSelect = ({ taskId, taskUser, readonly = false }: UserSelectProps) => {
+export const UserSelect = ({ taskId, taskUser, variant = "task" }: UserSelectProps) => {
     const [showUserSelection, setShowUserSelection] = useState<boolean>(false);
     const userSelectModalRef = useRef<HTMLDivElement>(null);
     const [users, setUsers] = useState<{ id: number; username: string; avatar_url: string }[]>([]);
@@ -21,7 +21,6 @@ export const UserSelect = ({ taskId, taskUser, readonly = false }: UserSelectPro
     const updateTaskUser = useReleaseBoardStore((state) => state.updateTaskUser);
 
     const handleOpenUserSelection = () => {
-        if (readonly) return;
         setShowUserSelection(true);
     };
 
@@ -52,13 +51,20 @@ export const UserSelect = ({ taskId, taskUser, readonly = false }: UserSelectPro
     }, [showUserSelection, setUsers, workspace?.id]);
 
     return (
-        <div className="user-select">
+        <div className="user-select" onClick={(e) => e.stopPropagation()}>
             {taskUser ? (
-                <div onClick={handleOpenUserSelection}>
+                <div className="user" onClick={handleOpenUserSelection}>
                     <UserAvatar username={taskUser.username} avatarUrl={taskUser.avatar_url} />
+                    {variant === "modal" && taskUser.username}
                 </div>
             ) : (
-                <Button color="outlined" size="small" variant="icon" icon="userCircle" onClick={handleOpenUserSelection} />
+                <>
+                    {variant === "modal" ? (
+                        <div onClick={handleOpenUserSelection}>Empty</div>
+                    ) : (
+                        <Button color="outlined" size="small" variant="icon" icon="circleUser" onClick={handleOpenUserSelection} />
+                    )}
+                </>
             )}
 
             {showUserSelection && (

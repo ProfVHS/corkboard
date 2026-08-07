@@ -8,7 +8,8 @@
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
-#  username               :string
+#  role                   :string           default("user"), not null
+#  username               :citext
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  last_workspace_id      :bigint
@@ -18,6 +19,7 @@
 #  index_users_on_jti                   (jti) UNIQUE
 #  index_users_on_last_workspace_id     (last_workspace_id)
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
+#  index_users_on_username              (username) UNIQUE
 #
 # Foreign Keys
 #
@@ -33,15 +35,15 @@ class User < ApplicationRecord
 
   validates :username,
             presence: true,
-            uniqueness: true,
+            uniqueness: { case_sensitive: false },
             format: {
               with: /\A[a-zA-Z0-9_-]+\z/,
               message: "cannot contain spaces"
             }
-  validates :password, presence: true, length: { minimum: 6 }, if: -> { new_record? || password.present? }
+  validates :password, length: { minimum: 6 }, if: -> { new_record? || password.present? }
   has_and_belongs_to_many :workspaces
   has_many :documents, foreign_key: :owner_id
-  has_one :user_preference
+  has_one :user_preference, dependent: :destroy
   belongs_to :last_workspace, class_name: "Workspace", optional: true
 
   has_one_attached :avatar
@@ -61,6 +63,10 @@ class User < ApplicationRecord
     self.username
   end
 
+  def superadmin?
+    role == "superadmin"
+  end
+
   def avatar_url
     if self.avatar.attached?
       "#{Rails.application.config.action_controller.default_url_options[:host]}#{Rails.application.routes.url_helpers.rails_blob_path(self.avatar, only_path: true)}"
@@ -76,6 +82,6 @@ class User < ApplicationRecord
   end
 
   def create_preference
-    create_user_preference! unless user_preference
+    create_user_preference!(task_display: "modal")
   end
 end
