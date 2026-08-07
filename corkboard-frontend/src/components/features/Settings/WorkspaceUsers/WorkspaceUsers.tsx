@@ -15,6 +15,7 @@ type User = {
     username: string;
     preferences: UserPreferences;
     role: string;
+    avatar_url: string
 };
 
 export const WorkspaceUsers = () => {
