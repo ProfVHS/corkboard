@@ -69,7 +69,7 @@ class User < ApplicationRecord
 
   def avatar_url
     if self.avatar.attached?
-      "#{Rails.application.config.action_controller.default_url_options[:host]}#{Rails.application.routes.url_helpers.rails_blob_path(self.avatar, only_path: true)}"
+      self.avatar.url(expires_in: 1.hour)
     else
       nil
     end
