@@ -3,8 +3,10 @@ import { Button } from "../../ui/Button/Button.tsx";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { api } from "../../../api/api.ts";
 import { LabeledInput } from "../../ui/LabeledInput/LabeledInput.tsx";
+import type { WorkspaceType } from "../../../types/WorkspaceType.ts";
 
 type CreateWorkspaceModalProps = {
+    onSave: (data: WorkspaceType) => void;
     onClose: () => void;
 };
 
@@ -12,13 +14,12 @@ type Inputs = {
     name: string;
 };
 
-export const CreateWorkspaceModal = ({ onClose }: CreateWorkspaceModalProps) => {
+export const CreateWorkspaceModal = ({ onSave, onClose }: CreateWorkspaceModalProps) => {
     const { register, handleSubmit } = useForm<Inputs>();
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         api.post("/workspaces", { name: data.name }).then((response) => {
-            console.log(response.data);
-            onClose();
+            onSave(response.data);
         });
     };
 

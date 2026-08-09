@@ -1,17 +1,15 @@
 @use '../../../global/colors' as colors;
 
 .board-column {
+  height: fit-content;
+  max-height: 100%;
+  min-width: 300px;
+
   display: flex;
   flex-direction: column;
-  max-height: 100%;
-  height: fit-content;
-  min-width: 250px;
-  width: 300px;
   padding: 8px;
-
   box-sizing: border-box;
   border-radius: 8px;
-
 
   &__header {
     display: flex;

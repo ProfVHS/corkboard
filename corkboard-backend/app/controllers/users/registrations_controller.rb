@@ -12,18 +12,16 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def respond_with(resource, _opts = {})
     Rails.logger.debug params.inspect
     if resource.persisted?
-      @token = request.env['warden-jwt_auth.token']
-      headers['Authorization'] = @token
+      @token = request.env["warden-jwt_auth.token"]
+      headers["Authorization"] = @token
 
       render json: {
-        status: { code: 200, message: 'Signed up successfully.',
-                  token: @token,
-                  data: UserSerializer.new(resource).serializable_hash[:data][:attributes] }
-      }
+        message: "Signed up successfully",
+        token: @token,
+        user: UserSerializer.new(resource).serializable_hash[:data][:attributes]
+      }, status: :ok
     else
-      render json: {
-        status: { message: "User couldn't be created successfully. #{resource.errors.full_messages.to_sentence}" }
-      }, status: :unprocessable_entity
+      render json: { message: "#{resource.errors.full_messages.to_sentence}" }, status: :unprocessable_entity
     end
   end
 end

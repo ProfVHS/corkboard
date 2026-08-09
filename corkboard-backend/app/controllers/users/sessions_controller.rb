@@ -7,7 +7,7 @@ class Users::SessionsController < Devise::SessionsController
 
     if user&.valid_password?(params[:user][:password])
       sign_in(user)
-      token = request.env['warden-jwt_auth.token']
+      token = request.env["warden-jwt_auth.token"]
       workspace_id = user.last_workspace_id
 
       if workspace_id.nil?
@@ -15,20 +15,19 @@ class Users::SessionsController < Devise::SessionsController
       end
 
       render json: {
-        status: 200,
-        message: 'Logged in successfully',
+        message: "Logged in successfully",
         token: token,
         workspace_id: workspace_id,
-        data: UserSerializer.new(user).serializable_hash[:data][:attributes]
-      }
+        user: UserSerializer.new(user).serializable_hash[:data][:attributes]
+      }, status: :ok
     else
-      render json: { status: 401, message: 'Invalid username or password' }, status: :unauthorized
+      render json: { message: "Invalid username or password" }, status: :unauthorized
     end
   end
 
   def destroy
     sign_out(resource_name)
-    render json: { status: 200, message: 'Logged out successfully.' }, status: :ok
+    render json: { message: "Logged out successfully" }, status: :ok
   end
 
   private
@@ -38,16 +37,14 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def respond_with(resource, _opt = {})
-    @token = request.env['warden-jwt_auth.token']
-    headers['Authorization'] = @token
+    @token = request.env["warden-jwt_auth.token"]
+    headers["Authorization"] = @token
 
     render json: {
       status: {
-        code: 200, message: 'Logged in successfully.',
+        message: "Logged in successfully",
         token: @token,
-        data: {
-          user: UserSerializer.new(resource).serializable_hash[:data][:attributes]
-        }
+        user: UserSerializer.new(resource).serializable_hash[:data][:attributes]
       }
     }, status: :ok
   end

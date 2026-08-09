@@ -7,16 +7,11 @@ import { InviteUserModal } from "./InviteUserModal.tsx";
 import { useParams } from "react-router-dom";
 import { Table } from "../../../ui/Table/Table.tsx";
 import { UserDisplay } from "../../../ui/UserDisplay/UserDisplay.tsx";
-import type { UserPreferences } from "../../../../context/auth/types.ts";
 import Loading from "../../../ui/Loading/Loading.tsx";
-
-type User = {
-    id: number;
-    username: string;
-    preferences: UserPreferences;
-    role: string;
-    avatar_url: string
-};
+import type { User } from "../../../../context/auth/types.ts";
+import { useWorkspaceStore } from "../../../../store/workspaceStore.ts";
+import { useAuth } from "../../../../context/auth/useAuth.ts";
+import DeleteWorkspaceUserModal from "./DeleteWorkspaceUserModal.tsx";
 
 export const WorkspaceUsers = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -24,11 +19,14 @@ export const WorkspaceUsers = () => {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
     const { workspaceId } = useParams();
+    const { user } = useAuth();
+    const workspace = useWorkspaceStore((state) => state.workspace);
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
     useEffect(() => {
-        api.get(`workspaces/${workspaceId}/collaborators`).then((res) => {
-            setUsers(res.data.collaborators);
-            setInvitedUsers(res.data.invited_users);
+        api.get(`workspaces/${workspaceId}/collaborators`).then((response) => {
+            setUsers(response.data.collaborators);
+            setInvitedUsers(response.data.invited_users);
             setLoading(false);
         });
     }, []);
@@ -40,7 +38,10 @@ export const WorkspaceUsers = () => {
             <span className="workspace-users__title">Manage people</span>
 
             <div className="workspace-users__list">
-                {invitedUsers && invitedUsers.map((user, index) => <WorkspaceUser key={index} username={user.username} role={user.role} isInvited />)}
+                {invitedUsers &&
+                    invitedUsers.map((user, index) => (
+                        <WorkspaceUser key={index} user={user} onCancel={() => setInvitedUsers((prev) => prev.filter((u) => u.id !== user.id))} isInvited />
+                    ))}
 
                 <Table
                     data={users}
@@ -51,16 +52,16 @@ export const WorkspaceUsers = () => {
                             render: (_, row) => <UserDisplay user={row} />,
                         },
                         {
-                            key: "role",
-                            header: "Role",
-                        },
-                        {
                             key: "id",
                             header: "Options",
-                            render: () => (
+                            render: (_, row) => (
                                 <>
-                                    <Button icon="trash" variant="icon" size="small" color="outlined" />
-                                    <Button icon="edit" variant="icon" size="small" color="outlined" />
+                                    {workspace?.owner.id === user?.id && user?.id !== row.id && (
+                                        <>
+                                            <Button icon="edit" variant="icon" size="small" color="outlined" />
+                                            <Button icon="trash" variant="icon" size="small" color="outlined" onClick={() => setUserToDelete(row)} />
+                                        </>
+                                    )}
                                 </>
                             ),
                         },
@@ -72,7 +73,26 @@ export const WorkspaceUsers = () => {
                     </Button>
                 </Table>
             </div>
-            {showInviteModal && workspaceId && <InviteUserModal onClose={() => setShowInviteModal(false)} workspaceId={parseInt(workspaceId)} />}
+            {showInviteModal && workspaceId && (
+                <InviteUserModal
+                    onSave={(user: User) => {
+                        invitedUsers.push(user);
+                        setShowInviteModal(false);
+                    }}
+                    onClose={() => setShowInviteModal(false)}
+                    workspaceId={parseInt(workspaceId)}
+                />
+            )}
+            {userToDelete && (
+                <DeleteWorkspaceUserModal
+                    user={userToDelete}
+                    onSave={(user: User) => {
+                        setUserToDelete(null);
+                        setUsers((prev) => prev.filter((u) => u.id !== user.id));
+                    }}
+                    onClose={() => setUserToDelete(null)}
+                />
+            )}
         </div>
     );
 };

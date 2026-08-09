@@ -42,7 +42,7 @@ class User < ApplicationRecord
             }
   validates :password, length: { minimum: 6 }, if: -> { new_record? || password.present? }
   has_and_belongs_to_many :workspaces
-  has_many :documents, foreign_key: :owner_id
+  has_many :documents, foreign_key: :owner_id, dependent: :destroy
   has_one :user_preference, dependent: :destroy
   belongs_to :last_workspace, class_name: "Workspace", optional: true
 
@@ -78,10 +78,13 @@ class User < ApplicationRecord
   private
 
   def create_workspace
-    workspaces.create!(name: "#{username}'s Workspace", owner: self)
+    workspace = Workspace.create(name: "#{username}'s Workspace", owner: self)
+    update_column(:last_workspace_id, workspace.id) if workspace.persisted? && respond_to?(:last_workspace_id)
   end
 
   def create_preference
-    create_user_preference!(task_display: "modal")
+    UserPreference.find_or_create_by(user_id: id) do |pref|
+      pref.task_display = "modal"
+    end
   end
 end

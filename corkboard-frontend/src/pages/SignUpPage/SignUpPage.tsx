@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Icon } from "../../components/ui/Icons/Icon.tsx";
+import { useToast } from "../../hooks/useToast.ts";
 
 const schema = yup
     .object({
@@ -26,13 +27,14 @@ export const SignUpPage = () => {
     } = useForm({
         resolver: yupResolver(schema),
     });
-
+    const toast = useToast();
     const navigate = useNavigate();
 
     const onSubmit = (data: FormData) => {
-        api.post("/signup", { user: data }).then((res) => {
-            localStorage.setItem("token", res.data.token);
+        api.post("/signup", { user: data }).then((response) => {
+            localStorage.setItem("token", response.data.token);
             navigate("/");
+            toast.success(response.data.message);
         });
     };
 

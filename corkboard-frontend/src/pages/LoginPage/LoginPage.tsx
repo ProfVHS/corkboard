@@ -6,6 +6,7 @@ import { api } from "../../api/api.ts";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../../components/ui/Icons/Icon.tsx";
 import { useAuth } from "../../context/auth/useAuth.ts";
+import { useToast } from "../../hooks/useToast.ts";
 
 type Inputs = {
     username: string;
@@ -16,18 +17,21 @@ export const LoginPage = () => {
     const { register, handleSubmit } = useForm<Inputs>();
     const { setToken, setUser } = useAuth();
     const navigate = useNavigate();
+    const toast = useToast();
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
-        api.post("/login", { user: data }).then((res) => {
-            localStorage.setItem("token", res.data.token);
-            setToken(res.data.token);
-            setUser(res.data.data);
+        api.post("/login", { user: data }).then((response) => {
+            localStorage.setItem("token", response.data.token);
+            setToken(response.data.token);
+            setUser(response.data.user);
 
-            if (res.data.data.role === "superadmin") {
+            if (response.data.user.role === "superadmin") {
                 navigate(`/superadmin`);
             } else {
-                navigate(`/workspaces/${res.data.workspace_id}/current_release`);
+                navigate(`/workspaces/${response.data.workspace_id}/current_release`);
             }
+
+            toast.success(response.data.message);
         });
     };
 

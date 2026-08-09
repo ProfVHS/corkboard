@@ -7,8 +7,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { ErrorsDisplay } from "../../../ui/ErrorsDisplay/ErrorsDisplay.tsx";
 import { api } from "../../../../api/api.ts";
 import { useToast } from "../../../../hooks/useToast.ts";
+import type { User } from "../../../../context/auth/types.ts";
 
 type InviteUserModalProps = {
+    onSave: (user: User) => void;
     onClose: () => void;
     workspaceId: number;
 };
@@ -21,7 +23,7 @@ const schema = yup
 
 type FormData = yup.InferType<typeof schema>;
 
-export const InviteUserModal = ({ onClose, workspaceId }: InviteUserModalProps) => {
+export const InviteUserModal = ({ onSave, onClose, workspaceId }: InviteUserModalProps) => {
     const {
         register,
         handleSubmit,
@@ -33,10 +35,11 @@ export const InviteUserModal = ({ onClose, workspaceId }: InviteUserModalProps) 
         api.post(`workspaces/${workspaceId}/invite_user`, { username: data.username.toLowerCase() }).then((response) => {
             if (response.data.status === "success") {
                 toast.success(response.data.message);
+                onSave(response.data.user);
             } else {
                 toast.warning(response.data.message);
+                onClose();
             }
-            onClose();
         });
     };
 
@@ -51,7 +54,7 @@ export const InviteUserModal = ({ onClose, workspaceId }: InviteUserModalProps) 
             </Modal.Body>
             <Modal.Footer>
                 <Button onClick={handleSubmit(onSubmit)}>Invite</Button>
-                <Button color="secondary" onClick={() => onClose()}>
+                <Button color="secondary" onClick={onClose}>
                     Cancel
                 </Button>
             </Modal.Footer>

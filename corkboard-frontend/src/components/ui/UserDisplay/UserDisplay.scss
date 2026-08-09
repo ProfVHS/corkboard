@@ -3,4 +3,12 @@
   align-items: center;
   flex-direction: row;
   gap: 1rem;
+
+  .owner-badge {
+    background-color: #122B4C;
+    color: #6BC1FF;
+    padding: 2px 6px;
+
+    border-radius: 5px;
+  }
 }

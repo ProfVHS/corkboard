@@ -14,6 +14,7 @@ import { UserAvatar } from "../../ui/UserAvatar/UserAvatar.tsx";
 import { UserNotifications } from "../UserNotifications/UserNotifications.tsx";
 import { Button } from "../../ui/Button/Button.tsx";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../../../hooks/useToast.ts";
 
 export const Navbar = () => {
     const { user } = useAuth();
@@ -30,6 +31,7 @@ export const Navbar = () => {
     const isActiveDocumentLink = location.pathname.startsWith(`/workspaces/${workspace?.id}/documents/`);
     const [showUserModal, setShowUserModal] = useState<boolean>(false);
     const navigate = useNavigate();
+    const toast = useToast();
 
     const handleWorkspaceCreate = () => {
         setMenuOpen(false);
@@ -37,9 +39,11 @@ export const Navbar = () => {
     };
 
     const handleLogout = () => {
-        api.delete("/logout");
-        localStorage.setItem("token", "");
-        navigate("/");
+        api.delete("/logout").then((response) => {
+            localStorage.setItem("token", "");
+            navigate("/");
+            toast.success(response.data.message);
+        });
     };
 
     useEffect(() => {
@@ -86,7 +90,15 @@ export const Navbar = () => {
                 <div className="navbar__app-name">Corkboard</div>
             </div>
 
-            {showWorkspaceForm && <CreateWorkspaceModal onClose={() => setShowWorkspaceForm(false)} />}
+            {showWorkspaceForm && (
+                <CreateWorkspaceModal
+                    onSave={(data: WorkspaceType) => {
+                        workspaces.push(data);
+                        setShowWorkspaceForm(false);
+                    }}
+                    onClose={() => setShowWorkspaceForm(false)}
+                />
+            )}
 
             {workspace && workspaces.length > 0 && user?.role === "user" && <Workspace ref={workspaceRef} name={workspace.name} />}
             {isMenuOpen && workspaces.length > 0 && (
@@ -115,7 +127,7 @@ export const Navbar = () => {
                             <UserAvatar username={user.username} />
                             <span>{user.username}</span>
                         </div>
-                        <UserNotifications />
+                        <UserNotifications updateWorkspaces={(workspace: WorkspaceType) => workspaces.push(workspace)} />
                     </div>
 
                     {showUserModal && (
