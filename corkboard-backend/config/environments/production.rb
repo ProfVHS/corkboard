@@ -14,7 +14,6 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
   config.cache_store = :memory_store
   config.active_job.queue_adapter = :sidekiq
-  config.solid_queue.connects_to = { database: { writing: :queue } }
 
   config.action_mailer.default_url_options = { host: "example.com" }
   config.i18n.fallbacks = true
