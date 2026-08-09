@@ -1,11 +1,17 @@
 import "./UserAvatar.scss";
+import { ClassNames } from "../../../global/utils.ts";
+import type { User } from "../../../context/auth/types.ts";
 
 type UserAvatarProps = {
-    username: string;
-    avatarUrl?: string;
+    user: User
+    onClick?: () => void;
 };
-export const UserAvatar = ({ username, avatarUrl }: UserAvatarProps) => {
-    const usernameFirstLetter = username[0].toUpperCase();
+export const UserAvatar = ({ user, onClick }: UserAvatarProps) => {
+    const usernameFirstLetter = user.username[0].toUpperCase();
 
-    return <div className="user-avatar">{avatarUrl ? <img src={avatarUrl} alt={usernameFirstLetter} /> : usernameFirstLetter}</div>;
+    return (
+        <div className={ClassNames("user-avatar", { clickable: !!onClick })} style={{ background: user.avatar_url ? "none" : user.color }} onClick={onClick}>
+            {user.avatar_url ? <img src={user.avatar_url} alt={usernameFirstLetter} /> : usernameFirstLetter}
+        </div>
+    );
 };

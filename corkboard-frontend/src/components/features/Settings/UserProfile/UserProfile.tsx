@@ -4,7 +4,7 @@ import { LabeledInput } from "../../../ui/LabeledInput/LabeledInput.tsx";
 import { api } from "../../../../api/api.ts";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/auth/useAuth.ts";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { TaskDisplayType } from "../../../../types/TaskDisplayType.ts";
 import { UserAvatar } from "../../../ui/UserAvatar/UserAvatar.tsx";
 import { CropAvatarModal } from "../../CropModal/CropModal.tsx";
@@ -14,6 +14,8 @@ export const UserProfile = () => {
     const { user, setUser } = useAuth();
     const [username, setUsername] = useState<string>(user ? user.username : "");
     const [avatar, setAvatar] = useState<string | null>(null);
+
+    const avatarInput = useRef<HTMLInputElement>(null)
 
     const handleLogout = () => {
         api.delete("/logout");
@@ -42,8 +44,6 @@ export const UserProfile = () => {
 
         formData.append("user[avatar]", value);
 
-        console.log(formData);
-
         api.put(`users/${user.id}`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -64,6 +64,12 @@ export const UserProfile = () => {
         e.target.value = "";
     };
 
+    const handleAvatarClick = () => {
+        if (!avatarInput.current) return
+
+        avatarInput.current.click()
+    }
+
     return (
         <div className="user-profile">
             {avatar && <CropAvatarModal avatarUrl={avatar} onConfirm={handleAvatarSave} onClose={() => setAvatar(null)} />}
@@ -76,8 +82,8 @@ export const UserProfile = () => {
                 </div>
                 <div className="user-profile__section-content">
                     <div className="avatar-text">Avatar</div>
-                    {user && <UserAvatar username={user.username} avatarUrl={user.avatar_url} />}
-                    <input type="file" onChange={(e) => handleFileChange(e)} />
+                    {user && <UserAvatar onClick={handleAvatarClick} user={user} />}
+                    <input type="file" ref={avatarInput} onChange={(e) => handleFileChange(e)} style={{ display: "none" }} />
                     <LabeledInput
                         label="Full Name"
                         value={username}

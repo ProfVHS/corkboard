@@ -12,7 +12,7 @@ export const UserDisplay = ({ user }: UserDisplayProps) => {
 
     return (
         <div className="user-display">
-            <UserAvatar username={user.username} avatarUrl={user.avatar_url}/>
+            <UserAvatar user={user}/>
             <span>{user.username}</span>
             {workspace?.owner.id === user.id && <span className="owner-badge">Owner</span>}
         </div>

@@ -124,7 +124,7 @@ export const Navbar = () => {
                 <>
                     <div className="user">
                         <div className="info" ref={profileRef} onClick={() => setShowUserModal(true)}>
-                            <UserAvatar username={user.username} />
+                            <UserAvatar user={user} />
                             <span>{user.username}</span>
                         </div>
                         <UserNotifications updateWorkspaces={(workspace: WorkspaceType) => workspaces.push(workspace)} />

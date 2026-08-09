@@ -1,7 +1,8 @@
 export type User = {
     id: number;
     username: string;
-    avatar_url: string
+    avatar_url: string;
+    color: string;
 };
 
 export type UserSettings = {
@@ -10,6 +11,7 @@ export type UserSettings = {
     avatar_url: string
     preferences: UserPreferences;
     role: "user" | "superadmin";
+    color: string;
 };
 
 export type UserPreferences = {

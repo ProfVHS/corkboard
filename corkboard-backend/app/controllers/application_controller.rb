@@ -2,6 +2,7 @@ include Devise::Controllers::Helpers
 
 class ApplicationController < ActionController::API
   include ActionController::MimeResponds
+  include ActiveStorage::SetCurrent
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   protected

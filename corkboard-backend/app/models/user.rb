@@ -3,6 +3,7 @@
 # Table name: users
 #
 #  id                     :bigint           not null, primary key
+#  color                  :string           not null
 #  encrypted_password     :string           default(""), not null
 #  jti                    :string           not null
 #  remember_created_at    :datetime
@@ -32,6 +33,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable,
          :jwt_authenticatable, jwt_revocation_strategy: self
+  has_one_attached :avatar
 
   validates :username,
             presence: true,
@@ -41,15 +43,20 @@ class User < ApplicationRecord
               message: "cannot contain spaces"
             }
   validates :password, length: { minimum: 6 }, if: -> { new_record? || password.present? }
+
   has_and_belongs_to_many :workspaces
   has_many :documents, foreign_key: :owner_id, dependent: :destroy
   has_one :user_preference, dependent: :destroy
   belongs_to :last_workspace, class_name: "Workspace", optional: true
 
-  has_one_attached :avatar
-
   after_create :create_workspace
   after_create :create_preference
+
+  before_save :defaults
+
+  def defaults
+    self.color ||= username_to_color
+  end
 
   def email_required?
     false
@@ -73,6 +80,14 @@ class User < ApplicationRecord
     else
       nil
     end
+  end
+
+  def username_to_color
+    sum = self.username.bytes.sum
+
+    hue = sum % 360
+
+    "hsl(#{hue}, 70%, 50%)".paint.to_hex
   end
 
   private

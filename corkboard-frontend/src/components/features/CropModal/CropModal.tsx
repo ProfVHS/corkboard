@@ -3,17 +3,17 @@ import React, { useCallback, useRef, useState } from "react";
 import { Button } from "../../ui/Button/Button.tsx";
 import "./CropModal.scss"
 
-interface NaturalSize {
+type NaturalSize = {
     w: number;
     h: number;
 }
 
-interface Offset {
+type Offset = {
     x: number;
     y: number;
 }
 
-interface DragState {
+type DragState = {
     startX: number;
     startY: number;
     startOffset: Offset;
@@ -125,7 +125,7 @@ export const CropAvatarModal = ({avatarUrl, onConfirm, onClose}: CropModal) => {
         canvas.toBlob((blob) => {
             if(!blob) return;
             onConfirm(blob);
-        }, 'image/png');
+        }, 'image/jpeg');
     };
 
     return (
