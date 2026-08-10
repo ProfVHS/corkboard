@@ -8,7 +8,7 @@ type UserDisplayProps = {
 export const WorkspaceDisplay = ({workspace}: UserDisplayProps) => {
     return (
         <div className="workspace-display">
-            <WorkspaceAvatar name={workspace.name}/>
+            <WorkspaceAvatar workspace={workspace}/>
             <span>{workspace.name}</span>
         </div>
     )

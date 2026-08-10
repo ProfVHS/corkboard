@@ -2,31 +2,31 @@ import "./WorkspaceMenuItem.scss";
 import { useWorkspaceStore } from "../../../store/workspaceStore.ts";
 import { useNavigate } from "react-router-dom";
 import { useWorkspaceMenuStore } from "../../../store/workspaceMenuStore.ts";
-import type { User } from "../../../context/auth/types.ts";
+import { WorkspaceAvatar } from "../../ui/WorkspaceAvatar/WorkspaceAvatar.tsx";
+import type { WorkspaceType } from "../../../types/WorkspaceType.ts";
 
 type WorkspaceMenuItemProps = {
-    id: number;
-    name: string;
-    owner: User;
-    number_of_members: number;
+    workspace: WorkspaceType;
 };
 
-export const WorkspaceMenuItem = ({ id, name, owner, number_of_members }: WorkspaceMenuItemProps) => {
+export const WorkspaceMenuItem = ({ workspace }: WorkspaceMenuItemProps) => {
     const setWorkspace = useWorkspaceStore((state) => state.setWorkspace);
     const setMenuOpen = useWorkspaceMenuStore((state) => state.setOpen);
     const navigate = useNavigate();
 
+    const id = workspace.id;
+
     const handleSwitchWorkspace = () => {
         localStorage.setItem("workspace_id", id.toString());
-        setWorkspace({ id, name, logo: "", owner, number_of_members });
+        setWorkspace(workspace);
         setMenuOpen(false);
         navigate(`/workspaces/${id}/current_release`);
     };
 
     return (
         <button key={id} className="workspace-menu__workspace" onClick={handleSwitchWorkspace}>
-            <div className="workspace-menu__workspace-logo">{name[0].toUpperCase()}</div>
-            <div className="workspace-menu__workspace-name">{name}</div>
+            <WorkspaceAvatar workspace={workspace} />
+            <div className="workspace-menu__workspace-name">{workspace.name}</div>
         </button>
     );
 };

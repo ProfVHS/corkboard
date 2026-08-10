@@ -100,7 +100,7 @@ export const Navbar = () => {
                 />
             )}
 
-            {workspace && workspaces.length > 0 && user?.role === "user" && <Workspace ref={workspaceRef} name={workspace.name} />}
+            {workspace && workspaces.length > 0 && user?.role === "user" && <Workspace ref={workspaceRef} workspace={workspace} />}
             {isMenuOpen && workspaces.length > 0 && (
                 <WorkspaceMenu ref={menuRef} workspaces={workspaces.filter((w) => w.id !== workspace?.id)} handleWorkspaceCreate={handleWorkspaceCreate} />
             )}

@@ -20,12 +20,12 @@ type DragState = {
 }
 
 type CropModal = {
-    avatarUrl: string;
+    imagePath: string;
     onConfirm: (blob: Blob) => void;
     onClose: () => void;
 };
 
-export const CropAvatarModal = ({avatarUrl, onConfirm, onClose}: CropModal) => {
+export const CropImageModal = ({imagePath, onConfirm, onClose}: CropModal) => {
     const [naturalSize, setNaturalSize] = useState<NaturalSize | null>(null);
     const [baseScale, setBaseScale] = useState<number>(1);
     const [zoom, setZoom] = useState<number>(1);
@@ -141,7 +141,7 @@ export const CropAvatarModal = ({avatarUrl, onConfirm, onClose}: CropModal) => {
                     onPointerUp={onPointerUp}
                     onPointerLeave={onPointerUp}
                 >
-                    <img ref={imgRef} src={avatarUrl} alt="" onLoad={handleImgLoad} style={imgStyle} className="crop-modal__image" draggable={false} />
+                    <img ref={imgRef} src={imagePath} alt="" onLoad={handleImgLoad} style={imgStyle} className="crop-modal__image" draggable={false} />
                 </div>
                 <div className="crop-modal__zoom">
                     <input

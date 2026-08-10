@@ -7,7 +7,7 @@ import { useAuth } from "../../../../context/auth/useAuth.ts";
 import { useRef, useState } from "react";
 import type { TaskDisplayType } from "../../../../types/TaskDisplayType.ts";
 import { UserAvatar } from "../../../ui/UserAvatar/UserAvatar.tsx";
-import { CropAvatarModal } from "../../CropModal/CropModal.tsx";
+import { CropImageModal } from "../../CropModal/CropModal.tsx";
 
 export const UserProfile = () => {
     const navigate = useNavigate();
@@ -72,7 +72,7 @@ export const UserProfile = () => {
 
     return (
         <div className="user-profile">
-            {avatar && <CropAvatarModal avatarUrl={avatar} onConfirm={handleAvatarSave} onClose={() => setAvatar(null)} />}
+            {avatar && <CropImageModal imagePath={avatar} onConfirm={handleAvatarSave} onClose={() => setAvatar(null)} />}
             <span className="user-profile__title">My settings</span>
 
             <div className="user-profile__section">

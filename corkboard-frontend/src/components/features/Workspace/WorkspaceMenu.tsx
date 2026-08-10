@@ -7,6 +7,7 @@ import { Button } from "../../ui/Button/Button.tsx";
 import { forwardRef } from "react";
 import { useWorkspaceMenuStore } from "../../../store/workspaceMenuStore.ts";
 import * as _ from "lodash";
+import { WorkspaceAvatar } from "../../ui/WorkspaceAvatar/WorkspaceAvatar.tsx";
 
 type WorkspaceMenuProps = {
     workspaces: WorkspaceType[];
@@ -35,7 +36,7 @@ export const WorkspaceMenu = forwardRef<HTMLDivElement, WorkspaceMenuProps>(({ w
     return (
         <div className="workspace-menu" ref={ref}>
             <div className="workspace-menu__header">
-                <div className="workspace-menu__logo">{workspace && (!workspace || !workspace.logo) ? workspace!.name[0].toUpperCase() : "Logo"}</div>
+                {workspace && <WorkspaceAvatar workspace={workspace} />}
 
                 <div className="workspace-menu__info">
                     <span className="workspace-menu__info-name">{workspace && workspace.name}</span>
@@ -66,13 +67,7 @@ export const WorkspaceMenu = forwardRef<HTMLDivElement, WorkspaceMenuProps>(({ w
                                     <>
                                         <span className="workspace-menu__owner">@{username}</span>
                                         {workspaces.map((workspace) => (
-                                            <WorkspaceMenuItem
-                                                key={workspace.id}
-                                                id={workspace.id}
-                                                name={workspace.name}
-                                                owner={workspace.owner}
-                                                number_of_members={workspace.number_of_members}
-                                            />
+                                            <WorkspaceMenuItem key={workspace.id} workspace={workspace} />
                                         ))}
                                     </>
                                 );
