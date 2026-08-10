@@ -33,7 +33,7 @@ class Workspace < ApplicationRecord
 
   def logo_url
     if self.logo.attached?
-      self.logo.url(expires_in: 1.hour)
+      Rails.application.routes.url_helpers.rails_storage_proxy_url(self.logo, only_path: false)
     else
       nil
     end

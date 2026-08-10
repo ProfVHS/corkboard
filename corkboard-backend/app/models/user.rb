@@ -76,7 +76,7 @@ class User < ApplicationRecord
 
   def avatar_url
     if self.avatar.attached?
-      self.avatar.url(expires_in: 1.hour)
+      Rails.application.routes.url_helpers.rails_storage_proxy_url(self.avatar, only_path: false)
     else
       nil
     end
