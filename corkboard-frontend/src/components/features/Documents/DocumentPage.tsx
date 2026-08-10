@@ -45,7 +45,7 @@ const DocumentPage = ({ document }: DocumentPageProps) => {
                 />
 
                 <div className="document-page__owner">
-                    <UserAvatar username={document.owner.username} />
+                    <UserAvatar user={document.owner} />
                     <span>{document.owner.username}</span>
                     <div className="dot"></div>
                     <span>

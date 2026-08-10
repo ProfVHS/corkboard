@@ -6,6 +6,7 @@ json.tasks do
       json.user do
         if task.user
           json.extract! task.user, :id, :username
+          json.avatar_url task.user.avatar_url
         else
           json.nil!
         end

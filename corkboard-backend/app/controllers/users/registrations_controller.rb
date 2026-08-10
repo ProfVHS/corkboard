@@ -1,6 +1,12 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   respond_to :json
 
+  protected
+
+  def update_resource(resource, params)
+    resource.update_without_password(params)
+  end
+
   private
 
   def respond_with(resource, _opts = {})

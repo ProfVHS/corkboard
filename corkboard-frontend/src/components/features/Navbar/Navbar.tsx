@@ -100,7 +100,7 @@ export const Navbar = () => {
                 />
             )}
 
-            {workspace && workspaces.length > 0 && user?.role === "user" && <Workspace ref={workspaceRef} name={workspace.name} />}
+            {workspace && workspaces.length > 0 && user?.role === "user" && <Workspace ref={workspaceRef} workspace={workspace} />}
             {isMenuOpen && workspaces.length > 0 && (
                 <WorkspaceMenu ref={menuRef} workspaces={workspaces.filter((w) => w.id !== workspace?.id)} handleWorkspaceCreate={handleWorkspaceCreate} />
             )}
@@ -124,7 +124,7 @@ export const Navbar = () => {
                 <>
                     <div className="user">
                         <div className="info" ref={profileRef} onClick={() => setShowUserModal(true)}>
-                            <UserAvatar username={user.username} />
+                            <UserAvatar user={user} />
                             <span>{user.username}</span>
                         </div>
                         <UserNotifications updateWorkspaces={(workspace: WorkspaceType) => workspaces.push(workspace)} />

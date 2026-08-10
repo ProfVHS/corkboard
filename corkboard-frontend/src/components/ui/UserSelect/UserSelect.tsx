@@ -19,7 +19,7 @@ export const UserSelect = ({ taskId, taskUser, variant = "task" }: UserSelectPro
             <div ref={buttonRef}>
                 {taskUser ? (
                     <div className="user" onClick={handleOpenUserSelection}>
-                        <UserAvatar username={taskUser.username} />
+                        <UserAvatar user={taskUser} />
                         {variant === "modal" && taskUser.username}
                     </div>
                 ) : (
@@ -41,7 +41,7 @@ export const UserSelect = ({ taskId, taskUser, variant = "task" }: UserSelectPro
                 >
                     {users.map((user) => (
                         <div key={user.id} className="item" onClick={() => handleAssignUserToTask(user.id)}>
-                            <UserAvatar username={user.username} />
+                            <UserAvatar user={user} />
                             <span>{user.username}</span>
                             {taskUser?.id === user.id && <Icon icon="close" />}
                         </div>

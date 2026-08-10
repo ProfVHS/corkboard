@@ -29,12 +29,12 @@ class TasksController < ApplicationController
   end
 
   def update
-    task = Task.includes(:user).find(params[:id])
+    @task = Task.includes(:user).find(params[:id])
 
     if tasks_params[:order]
       if tasks_params[:status]
-        if task.status != tasks_params[:status]
-          task.workspace.tasks.where(status: task.status, order: task.order..., release_id: task.release_id).where.not(id: params[:id]).each do |t|
+        if @task.status != tasks_params[:status]
+          @task.workspace.tasks.where(status: @task.status, order: @task.order..., release_id: @task.release_id).where.not(id: params[:id]).each do |t|
             order = t.order - 1
             t.update_column(:order, order)
           end
@@ -42,7 +42,7 @@ class TasksController < ApplicationController
       end
 
       order = tasks_params[:order]
-      task.workspace.tasks.where(status: tasks_params[:status] || task.status, order: tasks_params[:order]..., release_id: task.release_id).where.not(id: params[:id]).each do |t|
+      @task.workspace.tasks.where(status: tasks_params[:status] || @task.status, order: tasks_params[:order]..., release_id: @task.release_id).where.not(id: params[:id]).each do |t|
         order = order + 1
         t.update_column(:order, order)
       end
@@ -51,12 +51,11 @@ class TasksController < ApplicationController
     attrs = tasks_params.to_h
 
     if attrs[:user_id].present?
-      attrs[:user_id] = nil if attrs[:user_id].to_i == task.user_id
+      attrs[:user_id] = nil if attrs[:user_id].to_i == @task.user_id
     end
 
-    task.update!(attrs)
-    task.broadcast_to_release("task_updated", current_user)
-    render json: { task: task, user: task.user }, status: :created
+    @task.update!(attrs)
+    @task.broadcast_to_release("task_updated", current_user)
   end
 
   def destroy

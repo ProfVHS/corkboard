@@ -5,6 +5,7 @@ require "test_helper"
 # Table name: users
 #
 #  id                     :bigint           not null, primary key
+#  color                  :string           not null
 #  encrypted_password     :string           default(""), not null
 #  jti                    :string           not null
 #  remember_created_at    :datetime

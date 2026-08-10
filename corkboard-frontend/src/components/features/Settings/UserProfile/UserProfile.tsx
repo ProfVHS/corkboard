@@ -4,13 +4,18 @@ import { LabeledInput } from "../../../ui/LabeledInput/LabeledInput.tsx";
 import { api } from "../../../../api/api.ts";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../context/auth/useAuth.ts";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { TaskDisplayType } from "../../../../types/TaskDisplayType.ts";
+import { UserAvatar } from "../../../ui/UserAvatar/UserAvatar.tsx";
+import { CropImageModal } from "../../CropModal/CropModal.tsx";
 
 export const UserProfile = () => {
     const navigate = useNavigate();
     const { user, setUser } = useAuth();
     const [username, setUsername] = useState<string>(user ? user.username : "");
+    const [avatar, setAvatar] = useState<string | null>(null);
+
+    const avatarInput = useRef<HTMLInputElement>(null)
 
     const handleLogout = () => {
         api.delete("/logout");
@@ -32,8 +37,42 @@ export const UserProfile = () => {
         });
     };
 
+    const handleAvatarSave = (value: Blob) => {
+        if (!user) return;
+
+        const formData = new FormData();
+
+        formData.append("user[avatar]", value);
+
+        api.put(`users/${user.id}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }).then((response) => {
+            setUser(response.data);
+        });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !file.type.startsWith("image/")) return;
+
+        const reader = new FileReader();
+        reader.onload = () => setAvatar(reader.result as string);
+        reader.readAsDataURL(file);
+
+        e.target.value = "";
+    };
+
+    const handleAvatarClick = () => {
+        if (!avatarInput.current) return
+
+        avatarInput.current.click()
+    }
+
     return (
         <div className="user-profile">
+            {avatar && <CropImageModal imagePath={avatar} onConfirm={handleAvatarSave} onClose={() => setAvatar(null)} />}
             <span className="user-profile__title">My settings</span>
 
             <div className="user-profile__section">
@@ -43,7 +82,8 @@ export const UserProfile = () => {
                 </div>
                 <div className="user-profile__section-content">
                     <div className="avatar-text">Avatar</div>
-                    <div className="avatar">A</div>
+                    {user && <UserAvatar onClick={handleAvatarClick} user={user} />}
+                    <input type="file" ref={avatarInput} onChange={(e) => handleFileChange(e)} style={{ display: "none" }} />
                     <LabeledInput
                         label="Full Name"
                         value={username}

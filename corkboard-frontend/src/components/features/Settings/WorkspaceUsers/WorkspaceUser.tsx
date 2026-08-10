@@ -26,7 +26,7 @@ export const WorkspaceUser = ({ user, onCancel, isInvited }: WorkspaceUserProps)
 
     return (
         <div className={ClassNames("workspace-user", { invited: isInvited })}>
-            <UserAvatar username={user.username} />
+            <UserAvatar user={user} />
             <div className="name">{user.username}</div>
             {isInvited && <div className="invited-badge">Invited</div>}
             <div className="options">

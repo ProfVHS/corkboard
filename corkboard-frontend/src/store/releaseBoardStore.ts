@@ -211,10 +211,11 @@ export const useReleaseBoardStore = create<ReleaseBoardStore>((set, get) => ({
     },
     updateTaskUser: (taskId, userId) => {
         api.patch(`tasks/${taskId}`, { task: { user_id: userId } }).then((response) => {
-            const user = response.data.user ? { id: response.data.user.id, username: response.data.user.username } : null;
+            const user = response.data.user ? { ...response.data.user } : null;
 
             set((state) => {
                 return {
+                    ...state,
                     tasks: {
                         ...state.tasks,
                         [taskId]: { ...state.tasks[taskId], user },

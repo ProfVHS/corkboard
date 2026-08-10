@@ -1,14 +1,18 @@
-import "./WorkspaceAvatar.scss"
+import "./WorkspaceAvatar.scss";
+import type { WorkspaceType } from "../../../types/WorkspaceType.ts";
+import classNames from "classnames";
 
 type UserAvatarProps = {
-    name: string
-}
-export const WorkspaceAvatar = ({name}: UserAvatarProps) => {
-    const usernameFirstLetter = name[0].toUpperCase()
+    workspace: WorkspaceType;
+    onClick?: () => void;
+    className?: string
+};
+export const WorkspaceAvatar = ({ workspace, onClick, className }: UserAvatarProps) => {
+    const usernameFirstLetter = workspace.name[0].toUpperCase();
 
     return (
-        <div className="workspace-avatar">
-            {usernameFirstLetter}
+        <div onClick={onClick} className={classNames("workspace-avatar", className, { clickable: onClick })}>
+            {workspace.logo_url ? <img src={workspace.logo_url} alt={workspace.name} /> : usernameFirstLetter}
         </div>
-    )
-}
+    );
+};

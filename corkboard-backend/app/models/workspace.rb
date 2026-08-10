@@ -13,14 +13,11 @@
 #  fk_rails_...  (owner_id => users.id) ON DELETE => nullify
 #
 
-
-
-
-
 class Workspace < ApplicationRecord
   has_many :releases
   has_many :tasks
   has_many :documents
+  has_one_attached :logo
 
   has_and_belongs_to_many :users
   belongs_to :owner, class_name: "User", foreign_key: :owner_id
@@ -32,5 +29,13 @@ class Workspace < ApplicationRecord
   def next_release
     current_release = self.current_release
     self.releases.where(current: false, status: Release::QUEUED, order: current_release&.order..).order(:order).first
+  end
+
+  def logo_url
+    if self.logo.attached?
+      Rails.application.routes.url_helpers.rails_storage_proxy_url(self.logo, only_path: false)
+    else
+      nil
+    end
   end
 end
