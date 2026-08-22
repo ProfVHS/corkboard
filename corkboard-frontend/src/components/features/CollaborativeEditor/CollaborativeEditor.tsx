@@ -36,7 +36,7 @@ const Editor = ({ documentId, user, authToken, onReadyChange }: CollaborativeEdi
     if (!editor || isLoading) return null;
 
     return (
-        <>
+        <div className="collaborative-editor">
             <EditorContent editor={editor} />
             <BubbleMenu editor={editor}>
                 <div className="bubble-menu">
@@ -61,6 +61,6 @@ const Editor = ({ documentId, user, authToken, onReadyChange }: CollaborativeEdi
                     <AlignPopover editor={editor} />
                 </div>
             </BubbleMenu>
-        </>
+        </div>
     );
 };
