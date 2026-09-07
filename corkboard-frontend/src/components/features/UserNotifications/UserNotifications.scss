@@ -9,11 +9,14 @@
 
   .menu {
     width: max-content;
+    max-width: 300px;
+    max-height: 60vh;
+    overflow-y: auto;
 
     background: #0c0c0c;
-    position: absolute;
-    right: -5px;
-    bottom: calc(100% + 1rem);
+    position: fixed;
+    left: 10px;
+    bottom: 55px;
 
     border: 1px solid colors.$border-color;
     border-radius: 0.25rem;
@@ -21,11 +24,14 @@
     z-index: 9999;
 
     .header {
+      position: sticky;
+      top: 0;
       display: flex;
       font-size: 1.1rem;
       color: rgba(255, 255, 255, 0.6);
       padding: 0.5rem;
       border-bottom: 1px solid colors.$border-color;
+      background-color: #0c0c0c;
 
       .icon{
         width: 1.5rem;
@@ -38,10 +44,18 @@
       justify-content: center;
       align-items: center;
       gap: 0.5rem;
+
+      .accept {
+        color: #22C55E;
+      }
+
+      .decline {
+        color: #EF4444;
+      }
     }
 
     .message {
-      width: max-content;
+      width: 100%;
     }
 
     .notification {

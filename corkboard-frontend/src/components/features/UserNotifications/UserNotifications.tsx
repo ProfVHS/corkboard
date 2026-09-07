@@ -23,14 +23,14 @@ export const UserNotifications = ({ updateWorkspaces }: UserNotificationsProps) 
                     </div>
                     {invitations.map((invitation) => (
                         <div className="notification">
-                            <div className="user-notifications__message">
+                            <div className="message">
                                 {invitation.invited_by} invited you to {invitation.workspace.name}
                             </div>
-                            <div className="user-notifications__buttons">
-                                <Button color="outlined" size="small" onClick={() => acceptInvitation(invitation.workspace.id)}>
+                            <div className="buttons">
+                                <Button className="accept" color="outlined" size="small" onClick={() => acceptInvitation(invitation.workspace.id)}>
                                     Accept
                                 </Button>
-                                <Button color="outlined" size="small" onClick={() => declineInvitation(invitation.workspace.id, invitation.workspace.name)}>
+                                <Button className="decline" color="outlined" size="small" onClick={() => declineInvitation(invitation.workspace.id, invitation.workspace.name)}>
                                     Decline
                                 </Button>
                             </div>
