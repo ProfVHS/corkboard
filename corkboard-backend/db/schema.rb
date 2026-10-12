@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_15_220944) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_224348) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -19,7 +19,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_15_220944) do
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.jsonb "content"
     t.datetime "created_at", null: false
-    t.string "name"
+    t.string "name", null: false
     t.uuid "owner_id", null: false
     t.uuid "task_id"
     t.datetime "updated_at", null: false
@@ -39,12 +39,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_15_220944) do
   end
 
   create_table "releases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.boolean "completed"
+    t.boolean "completed", null: false
     t.datetime "created_at", null: false
-    t.boolean "current"
+    t.boolean "current", null: false
     t.string "name", null: false
     t.integer "order", null: false
-    t.string "status", default: "NOT_QUEUED"
+    t.string "status", default: "NOT_QUEUED", null: false
     t.datetime "updated_at", null: false
     t.uuid "workspace_id", null: false
   end
@@ -86,8 +86,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_15_220944) do
 
   create_table "user_preferences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.boolean "show_board_tags", default: true
-    t.boolean "spellcheck", default: false
+    t.boolean "show_board_tags", default: true, null: false
+    t.boolean "spellcheck", default: false, null: false
     t.string "task_display", default: "MODAL", null: false
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
@@ -119,20 +119,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_15_220944) do
 
   create_table "workspace_invitations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.uuid "invited_by_user_id"
-    t.uuid "invited_user_id"
-    t.string "status"
+    t.uuid "invited_by_user_id", null: false
+    t.uuid "invited_user_id", null: false
+    t.string "status", null: false
     t.datetime "updated_at", null: false
     t.uuid "workspace_id", null: false
   end
 
   create_table "workspaces", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "code_prefix", limit: 3
-    t.boolean "code_prefix_enabled", default: false
+    t.string "code_prefix", limit: 3, null: false
+    t.boolean "code_prefix_enabled", default: false, null: false
     t.datetime "created_at", null: false
     t.boolean "current", default: false, null: false
     t.string "name", null: false
-    t.uuid "owner_id"
+    t.uuid "owner_id", null: false
     t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_workspaces_on_slug", unique: true

@@ -27,7 +27,7 @@ class TasksController < ApplicationController
       ).lock.pluck(:order)
 
       @task = Task.create!(attrs.merge(order: (locked_orders.max || -1) + 1))
-      Document.create!(task: @task, owner: current_user, workspace_id: workspace_id)
+      Document.create!(task: @task, name: @task.code_name, owner: current_user, workspace_id: workspace_id)
     end
 
     @task.broadcast_to_release("task_created", current_user)

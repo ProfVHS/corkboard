@@ -3,8 +3,8 @@
 # Table name: user_preferences
 #
 #  id              :uuid             not null, primary key
-#  show_board_tags :boolean          default(TRUE)
-#  spellcheck      :boolean          default(FALSE)
+#  show_board_tags :boolean          default(TRUE), not null
+#  spellcheck      :boolean          default(FALSE), not null
 #  task_display    :string           default(NULL), not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null

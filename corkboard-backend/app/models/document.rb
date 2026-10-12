@@ -4,7 +4,7 @@
 #
 #  id           :uuid             not null, primary key
 #  content      :jsonb
-#  name         :string
+#  name         :string           not null
 #  yjs_state    :binary
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null

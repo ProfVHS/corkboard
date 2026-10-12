@@ -3,11 +3,11 @@
 # Table name: releases
 #
 #  id           :uuid             not null, primary key
-#  completed    :boolean
-#  current      :boolean
+#  completed    :boolean          not null
+#  current      :boolean          not null
 #  name         :string           not null
 #  order        :integer          not null
-#  status       :string           default("NOT_QUEUED")
+#  status       :string           default("NOT_QUEUED"), not null
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  workspace_id :uuid             not null

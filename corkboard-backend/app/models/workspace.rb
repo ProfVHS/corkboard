@@ -3,14 +3,14 @@
 # Table name: workspaces
 #
 #  id                  :uuid             not null, primary key
-#  code_prefix         :string(3)
-#  code_prefix_enabled :boolean          default(FALSE)
+#  code_prefix         :string(3)        not null
+#  code_prefix_enabled :boolean          default(FALSE), not null
 #  current             :boolean          default(FALSE), not null
 #  name                :string           not null
 #  slug                :string
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  owner_id            :uuid
+#  owner_id            :uuid             not null
 #
 # Indexes
 #

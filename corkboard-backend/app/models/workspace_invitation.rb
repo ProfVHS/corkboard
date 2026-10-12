@@ -3,11 +3,11 @@
 # Table name: workspace_invitations
 #
 #  id                 :uuid             not null, primary key
-#  status             :string
+#  status             :string           not null
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  invited_by_user_id :uuid
-#  invited_user_id    :uuid
+#  invited_by_user_id :uuid             not null
+#  invited_user_id    :uuid             not null
 #  workspace_id       :uuid             not null
 #
 # Foreign Keys
