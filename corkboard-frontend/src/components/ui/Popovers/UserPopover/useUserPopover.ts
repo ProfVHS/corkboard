@@ -16,6 +16,8 @@ const useUserPopover = ({ taskId, taskUser }: useUserPopoverProps) => {
     const updateTaskUser = useReleaseBoardStore((state) => state.updateTaskUser);
 
     const handleAssignUserToTask = (userId: string) => {
+        console.log("safdad")
+
         if (userId === taskUser?.id) {
             updateTaskUser(taskId, "");
         } else {

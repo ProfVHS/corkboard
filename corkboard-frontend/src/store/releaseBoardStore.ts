@@ -188,7 +188,7 @@ export const useReleaseBoardStore = create<ReleaseBoardStore>((set, get) => ({
                 },
             };
         });
-        api.put(`tasks/${taskId}`, { task: task });
+        api.put(`tasks/${taskId}`, { ...task });
     },
     moveToBacklog: (taskId) => {
         set((state) => {
@@ -211,10 +211,10 @@ export const useReleaseBoardStore = create<ReleaseBoardStore>((set, get) => ({
                 }),
             };
         });
-        api.put(`tasks/${taskId}`, { task: { status: "backlog" } });
+        api.put(`tasks/${taskId}`, { status: "backlog" });
     },
     updateTaskUser: (taskId, userId) => {
-        api.patch(`tasks/${taskId}`, { task: { user_id: userId } }).then((response) => {
+        api.put(`tasks/${taskId}`, { user_id: userId }).then((response) => {
             const user = response.data.user ? { id: response.data.user.id, username: response.data.user.username } : null;
 
             set((state) => {
