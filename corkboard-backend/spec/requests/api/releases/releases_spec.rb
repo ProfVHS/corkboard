@@ -13,12 +13,10 @@ describe "Releases", type: :request do
 
     it "permission" do
       [user2, superadmin].each do |user|
-        aggregate_failures("as #{user.username}") do
-          check_permission(:post, "/releases", user, { name: "New Release", workspace_id: user1_workspace.id })
-          check_permission(:get, "/releases/#{user1_workspace_release.id}/board", user)
-          check_permission(:put, "/releases/#{user1_workspace_release.id}", user, load_request("update_user1_workspace_release"))
-          check_permission(:delete, "/releases/#{user1_workspace_release.id}", user)
-        end
+        check_permission(:post, "/releases", user, { name: "New Release", workspace_id: user1_workspace.id })
+        check_permission(:get, "/releases/#{user1_workspace_release.id}/board", user)
+        check_permission(:put, "/releases/#{user1_workspace_release.id}", user, load_request("update_user1_workspace_release"))
+        check_permission(:delete, "/releases/#{user1_workspace_release.id}", user)
       end
     end
 
@@ -36,11 +34,11 @@ describe "Releases", type: :request do
 
     it "fetch" do
       Task.create!(name: "Task 1", workspace: user1_workspace, release: user1_workspace_release,
-                   user: nil, order: 0, status: "backlog")
+                   user: nil, position: 0, status: "backlog")
       Task.create!(name: "Task 2", workspace: user1_workspace, release: user1_workspace_release,
-                   user: nil, order: 1, status: "todo")
+                   user: nil, position: 1, status: "todo")
       Task.create!(name: "Task 3", workspace: user1_workspace, release: user1_workspace_release,
-                   user: nil, order: 2, status: "testing")
+                   user: nil, position: 2, status: "testing")
 
       # user can fetch release board
       get "/releases/#{user1_workspace_release.id}/board", headers: auth_headers(user1)

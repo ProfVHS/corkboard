@@ -2,7 +2,7 @@
   "name",
   "status",
   "priority",
-  "order",
+  "position",
   "user_id",
   "release_id",
   "workspace_id"

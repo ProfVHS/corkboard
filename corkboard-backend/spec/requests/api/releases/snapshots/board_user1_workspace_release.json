@@ -5,6 +5,7 @@
       "name": "Task 2",
       "status": "todo",
       "priority": null,
+      "position": 1,
       "code_name": "UW-02",
       "tags": [],
       "user": null
@@ -14,6 +15,7 @@
       "name": "Task 3",
       "status": "testing",
       "priority": null,
+      "position": 2,
       "code_name": "UW-03",
       "tags": [],
       "user": null

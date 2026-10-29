@@ -1,7 +1,8 @@
 {
   "id": "ANY",
   "name": "New Release",
-  "order": 2,
+  "current": false,
+  "position": 2,
   "status": "NOT_QUEUED",
   "progress": {
     "tasks": 0,

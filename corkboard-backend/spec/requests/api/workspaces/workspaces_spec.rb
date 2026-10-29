@@ -22,24 +22,22 @@ RSpec.describe "Workspaces", type: :request do
 
     it "permission" do
       [user2, superadmin].each do |user|
-        aggregate_failures("as #{user.username}") do
-          if user == superadmin
-            check_permission(:post, "/workspaces", user, load_request("create_user1_workspace"))
-            check_permission(:get, "/workspaces", user)
-          end
-
-          check_permission(:post, "/workspaces/#{user1_workspace.id}/complete_release", user)
-          check_permission(:post, "/workspaces/#{user1_workspace.id}/invite_user", user)
-          check_permission(:post, "/workspaces/#{user1_workspace.id}/accept_invitation", user)
-          check_permission(:get, "/workspaces/#{user1_workspace.id}", user)
-          check_permission(:get, "/workspaces/#{user1_workspace.id}/collaborators", user)
-          check_permission(:get, "/workspaces/#{user1_workspace.id}/current_release", user)
-          check_permission(:put, "/workspaces/#{user1_workspace.id}", user, load_request("update_user1_workspace"))
-          check_permission(:delete, "/workspaces/#{user1_workspace.id}", user)
-          check_permission(:delete, "/workspaces/#{user1_workspace.id}/decline_invitation", user, { name: second_user2_workspace.name })
-          check_permission(:delete, "/workspaces/#{user1_workspace.id}/cancel_invitation", user)
-          check_permission(:delete, "/workspaces/#{user1_workspace.id}/delete_user", user, { user_id: user5.id, username: user5.username })
+        if user == superadmin
+          check_permission(:post, "/workspaces", user, load_request("create_user1_workspace"))
+          check_permission(:get, "/workspaces", user)
         end
+
+        check_permission(:post, "/workspaces/#{user1_workspace.id}/complete_release", user)
+        check_permission(:post, "/workspaces/#{user1_workspace.id}/invite_user", user)
+        check_permission(:post, "/workspaces/#{user1_workspace.id}/accept_invitation", user)
+        check_permission(:get, "/workspaces/#{user1_workspace.id}", user)
+        check_permission(:get, "/workspaces/#{user1_workspace.id}/collaborators", user)
+        check_permission(:get, "/workspaces/#{user1_workspace.id}/current_release", user)
+        check_permission(:put, "/workspaces/#{user1_workspace.id}", user, load_request("update_user1_workspace"))
+        check_permission(:delete, "/workspaces/#{user1_workspace.id}", user)
+        check_permission(:delete, "/workspaces/#{user1_workspace.id}/decline_invitation", user, { name: second_user2_workspace.name })
+        check_permission(:delete, "/workspaces/#{user1_workspace.id}/cancel_invitation", user)
+        check_permission(:delete, "/workspaces/#{user1_workspace.id}/delete_user", user, { user_id: user5.id, username: user5.username })
       end
    end
 

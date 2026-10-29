@@ -15,14 +15,12 @@ describe "Tags", type: :request do
 
     it "permission" do
       [user2, superadmin].each do |user|
-        aggregate_failures("as #{user.username}") do
-          check_permission(:post, "/tags", user, { name: "", color: "", workspace_id: user1_workspace.id })
-          check_permission(:post, "/tasks/#{user1_workspace_task.id}/tags/#{user1_workspace_tag_bug.id}/assign", user)
-          check_permission(:get, "/tags", user, { workspace_id: user1_workspace.id })
-          check_permission(:put, "/tags/#{user1_workspace_tag_bug.id}", user, { name: "" })
-          check_permission(:delete, "/tags/#{user1_workspace_tag_bug.id}", user)
-          check_permission(:delete, "/tasks/#{user1_workspace_task.id}/tags/#{user1_workspace_tag_bug.id}/unassign", user)
-        end
+        check_permission(:post, "/tags", user, { name: "", color: "", workspace_id: user1_workspace.id })
+        check_permission(:post, "/tasks/#{user1_workspace_task.id}/tags/#{user1_workspace_tag_bug.id}/assign", user)
+        check_permission(:get, "/tags", user, { workspace_id: user1_workspace.id })
+        check_permission(:put, "/tags/#{user1_workspace_tag_bug.id}", user, { name: "" })
+        check_permission(:delete, "/tags/#{user1_workspace_tag_bug.id}", user)
+        check_permission(:delete, "/tasks/#{user1_workspace_task.id}/tags/#{user1_workspace_tag_bug.id}/unassign", user)
       end
     end
 
