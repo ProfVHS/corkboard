@@ -13,6 +13,7 @@ RSpec.describe "Workspaces", type: :request do
       check_authentication(:get, "/workspaces/#{user1_workspace.id}")
       check_authentication(:get, "/workspaces/#{user1_workspace.id}/collaborators")
       check_authentication(:get, "/workspaces/#{user1_workspace.id}/current_release")
+      check_authentication(:get, "/workspaces/#{user1_workspace.id}/backlog")
       check_authentication(:put, "/workspaces/#{user1_workspace.id}", load_request("update_user1_workspace"))
       check_authentication(:delete, "/workspaces/#{user1_workspace.id}")
       check_authentication(:delete, "/workspaces/#{user1_workspace.id}/decline_invitation", { name: second_user2_workspace.name })
@@ -33,6 +34,7 @@ RSpec.describe "Workspaces", type: :request do
         check_permission(:get, "/workspaces/#{user1_workspace.id}", user)
         check_permission(:get, "/workspaces/#{user1_workspace.id}/collaborators", user)
         check_permission(:get, "/workspaces/#{user1_workspace.id}/current_release", user)
+        check_permission(:get, "/workspaces/#{user1_workspace.id}/backlog", user)
         check_permission(:put, "/workspaces/#{user1_workspace.id}", user, load_request("update_user1_workspace"))
         check_permission(:delete, "/workspaces/#{user1_workspace.id}", user)
         check_permission(:delete, "/workspaces/#{user1_workspace.id}/decline_invitation", user, { name: second_user2_workspace.name })
@@ -78,6 +80,12 @@ RSpec.describe "Workspaces", type: :request do
       # user can fetch current release
       get "/workspaces/#{user1_workspace.id}/current_release", headers: auth_headers(user1)
       expect(response.body).to match_json_snapshot("user1_workspace_current_release")
+
+      # user can fetch backlog
+      Task.create!(name: "Task Backlog 1", release_id: nil, status: "backlog", position: 1, workspace_id: user1_workspace.id)
+      Task.create!(name: "Task Backlog 2", release_id: nil, status: "backlog", position: 2, workspace_id: user1_workspace.id)
+      get "/workspaces/#{user1_workspace.id}/backlog", headers: auth_headers(user1)
+      expect(response.body).to match_json_snapshot("user1_workspace_backlog")
     end
 
     it "update" do

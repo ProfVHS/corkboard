@@ -1,54 +1,50 @@
 {
-  "tasks": {
-    "ac6e0db5-e9d6-49f3-8065-e8200d6829df": {
-      "id": "ANY",
-      "name": "Task 2",
-      "status": "todo",
-      "priority": null,
-      "position": 1,
-      "code_name": "UW-02",
-      "tags": [],
-      "user": null
-    },
-    "8cb83edf-9057-40d1-a4e1-bba630991c66": {
-      "id": "ANY",
-      "name": "Task 3",
-      "status": "testing",
-      "priority": null,
-      "position": 2,
-      "code_name": "UW-03",
-      "tags": [],
-      "user": null
-    }
-  },
   "columns": [
     {
       "id": "adjustments",
-      "taskIds": []
+      "tasks": []
     },
     {
       "id": "todo",
-      "taskIds": [
-        "ANY"
+      "tasks": [
+        {
+          "id": "ANY",
+          "name": "Task 2",
+          "status": "todo",
+          "priority": null,
+          "position": 1,
+          "code_name": "UW-02",
+          "tags": [],
+          "user": null
+        }
       ]
     },
     {
       "id": "in_progress",
-      "taskIds": []
+      "tasks": []
     },
     {
       "id": "review_pending",
-      "taskIds": []
+      "tasks": []
     },
     {
       "id": "testing",
-      "taskIds": [
-        "ANY"
+      "tasks": [
+        {
+          "id": "ANY",
+          "name": "Task 3",
+          "status": "testing",
+          "priority": null,
+          "position": 2,
+          "code_name": "UW-03",
+          "tags": [],
+          "user": null
+        }
       ]
     },
     {
       "id": "accepted",
-      "taskIds": []
+      "tasks": []
     }
   ]
 }

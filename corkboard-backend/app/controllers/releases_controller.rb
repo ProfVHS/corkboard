@@ -35,8 +35,7 @@ class ReleasesController < ApplicationController
   end
 
   def board
-    @tasks = @release.tasks.includes(:user)
-    @backlog_tasks = Task.where(workspace_id: @release.workspace_id, status: Task.statuses[:backlog], release_id: nil)
+    @tasks = @release.tasks.includes(:user, :tags).order(:position)
   end
 
   def move
