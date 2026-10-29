@@ -31,8 +31,10 @@ const usersApi = {
             .then((response) => onSuccess(response.data))
             .catch(onError);
     },
-    delete: (userId: string, onSuccess: () => void, onError?: (error: unknown) => void) => {
-        api.delete(`/users/${userId}`).then(onSuccess).catch(onError);
+    delete: (userId: string, onSuccess: (response: any) => void, onError?: (error: unknown) => void) => {
+        api.delete(`/users/${userId}`)
+            .then((response) => onSuccess(response.data))
+            .catch(onError);
     },
     me: (onSuccess: (response: MeResponse) => void, onError?: (error: unknown) => void) => {
         api.get(`/users/me`)

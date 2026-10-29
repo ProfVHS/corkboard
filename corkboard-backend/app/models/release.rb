@@ -24,7 +24,7 @@
 
 class Release < ApplicationRecord
   belongs_to :workspace
-  has_many :tasks
+  has_many :tasks, dependent: :destroy
 
   before_save :defaults
   before_save :set_current
