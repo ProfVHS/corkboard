@@ -12,13 +12,19 @@ class TasksController < ApplicationController
   end
 
   def create
-    name = tasks_params[:name]
     release_id = tasks_params[:release_id]
-    workspace_id = tasks_params[:workspace_id]
     status = release_id.present? ? tasks_params[:status] : "backlog"
 
-    @task = Task.create!(name: name, release_id: release_id, status: status, workspace_id: workspace_id)
-    Document.create!(task: @task, name: @task.code_name, owner: current_user, workspace_id: workspace_id)
+    @task = Task.new(
+      name: tasks_params[:name],
+      release_id: release_id,
+      status: status,
+      workspace_id: tasks_params[:workspace_id]
+    )
+    authorize! :create, @task
+
+    @task.save!
+    Document.create!(task: @task, name: @task.code_name, owner: current_user, workspace_id: @task.workspace_id)
 
     @task.broadcast_to_release("task_created", current_user)
     render "show"

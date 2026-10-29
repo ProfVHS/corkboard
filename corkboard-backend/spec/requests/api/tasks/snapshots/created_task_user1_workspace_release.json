@@ -3,7 +3,7 @@
   "name": "New Task",
   "status": null,
   "priority": null,
-  "order": 0,
+  "position": 0,
   "code_name": "UW-05",
   "tags": []
 }

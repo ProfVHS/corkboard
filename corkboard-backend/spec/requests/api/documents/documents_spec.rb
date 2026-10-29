@@ -14,13 +14,11 @@ describe "Documents", type: :request do
 
     it "permission" do
       [user2, superadmin].each do |user|
-        aggregate_failures("as #{user.username}") do
-          check_permission(:post, "/documents", user, { workspace_id: user1_workspace.id })
-          check_permission(:get, "/documents", user, { workspace_id: user1_workspace.id })
-          check_permission(:get, "/documents/#{user1_workspace_task.id}", user)
-          check_permission(:put, "/documents/#{user1_workspace_document.id}", user)
-          check_permission(:delete, "/documents/#{user1_workspace_document.id}", user)
-        end
+        check_permission(:post, "/documents", user, { workspace_id: user1_workspace.id })
+        check_permission(:get, "/documents", user, { workspace_id: user1_workspace.id })
+        check_permission(:get, "/documents/#{user1_workspace_task.id}", user)
+        check_permission(:put, "/documents/#{user1_workspace_document.id}", user)
+        check_permission(:delete, "/documents/#{user1_workspace_document.id}", user)
       end
     end
 

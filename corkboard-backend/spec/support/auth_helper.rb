@@ -10,7 +10,7 @@ module AuthHelper
 
     public_send(verb, path, **options)
 
-    expect(response).to have_http_status(:forbidden)
+    expect(response).to have_http_status(:forbidden), "expected 403 for #{user.username} on #{verb.upcase} #{path}, got #{response.status}"
   end
 
   def check_authentication(verb, path, params = nil, headers: {})
@@ -19,7 +19,7 @@ module AuthHelper
 
     public_send(verb, path, **options)
 
-    expect(response).to have_http_status(:unauthorized)
+    expect(response).to have_http_status(:unauthorized), "expected 401 on #{verb.upcase} #{path}, got #{response.status}"
   end
 end
 
