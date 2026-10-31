@@ -22,7 +22,9 @@ type InputProps = {
     autoFocus?: boolean;
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
-    onChange?: (e: React.FocusEvent<HTMLInputElement>) => void;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
+    onClick?: (e: React.MouseEvent<HTMLInputElement>) => void;
     style?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 };
 
@@ -43,6 +45,8 @@ export const Input = ({
     onKeyDown,
     onBlur,
     onChange,
+    onFocus,
+    onClick,
     autoComplete = "off",
     autoFocus = true,
     style,
@@ -68,6 +72,8 @@ export const Input = ({
                 onKeyDown={(e) => onKeyDown && onKeyDown(e)}
                 onBlur={onBlur}
                 onChange={onChange}
+                onFocus={onFocus}
+                onClick={onClick}
                 {...register}
             />
 

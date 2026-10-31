@@ -31,8 +31,14 @@
   .panel {
     max-height: unset;
 
-    .input {
-      width: 140px;
+    .inputs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 5px;
+
+      .input {
+        width: 135px;
+      }
     }
   }
 }

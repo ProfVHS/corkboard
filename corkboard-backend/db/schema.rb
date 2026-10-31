@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_20_180407) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_31_115204) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -64,10 +64,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_180407) do
     t.string "code_name"
     t.integer "code_number"
     t.datetime "created_at", null: false
+    t.date "due_date"
     t.string "name"
     t.integer "position"
     t.string "priority"
     t.uuid "release_id"
+    t.date "start_date"
     t.string "status"
     t.datetime "updated_at", null: false
     t.uuid "user_id"

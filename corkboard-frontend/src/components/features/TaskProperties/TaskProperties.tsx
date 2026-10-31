@@ -65,7 +65,7 @@ const TaskProperties = ({ task }: TaskPropertiesProps) => {
             id: "date",
             name: "Dates",
             icon: "calendar",
-            component: <DatesPopover taskId={task.id} taskDateFrom={null} taskDateTo={null} />,
+            component: <DatesPopover taskId={task.id} taskStartDate={task.start_date} taskDueDate={task.due_date} />,
         },
     ].filter(Boolean) as ColumnType[];
 

@@ -1,38 +1,59 @@
 .rdp-root {
   --rdp-day-height: 32px;
   --rdp-day-width: 40px;
-  --rdp-day_button-height: 30px;
-  --rdp-day_button-width: 30px;
+  --rdp-day_button-height: 32px;
+  --rdp-day_button-width: 40px;
   --rdp-day_button-border-radius: 6px;
   --rdp-nav_button-height: 1.75rem;
   --rdp-nav_button-width: 1.75rem;
   font-size: 13px;
 }
 
-.rdp-root .rdp-today:not(.rdp-outside) .rdp-day_button {
-  background: #ef4444;
-  color: #fff;
-  border-radius: 50%;
-}
-
 .rdp-chevron {
-  fill: rgba(255, 255, 255, 0.6);;
+  fill: rgba(255, 255, 255, 0.6);
 }
 
-.rdp-root .rdp-range_start .rdp-day_button,
-.rdp-root .rdp-range_end .rdp-day_button {
+.rdp-root .rdp-day {
+  width: 40px;
+  height: 32px;
+  padding: 0;
+}
+.rdp-root .rdp-day_button {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.rdp-root .day-middle {
+  background: rgba(255, 255, 255, 0.12);
+}
+.rdp-root .day-middle .rdp-day_button {
+  background: transparent;
+  color: #fff;
+  border-radius: 0;
+}
+
+.rdp-root .day-start .rdp-day_button,
+.rdp-root .day-end .rdp-day_button {
+  width: 32px;
+  margin: 0 auto;
   background: #fff;
   color: #111;
-  border: none;
   border-radius: 6px;
 }
 
-.rdp-root .rdp-range_middle {
-  background: rgba(255, 255, 255, 0.12);
+.rdp-root .cap-start {
+  background: linear-gradient(to right, transparent 50%, rgba(255, 255, 255, 0.12) 50%);
 }
-.rdp-root .rdp-range_middle .rdp-day_button {
-  background: transparent;
+.rdp-root .cap-end {
+  background: linear-gradient(to left, transparent 50%, rgba(255, 255, 255, 0.12) 50%);
+}
+
+.rdp-root .rdp-today:not(.rdp-outside) .rdp-day_button {
+  width: 32px;
+  margin: 0 auto;
+  background: #ef4444;
   color: #fff;
-  border: none;
-  border-radius: 0;
+  border-radius: 50%;
 }

@@ -14,6 +14,8 @@ export type TaskType = {
     code_name: string;
     user: User | null;
     tags: TagType[];
+    start_date: Date | null;
+    due_date: Date | null;
 };
 
 export type Column = {
