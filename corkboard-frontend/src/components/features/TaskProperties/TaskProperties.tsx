@@ -5,6 +5,7 @@ import PriorityPopover from "@/ui/Popovers/PriorityPopover/PriorityPopover.tsx";
 import TaskStatusPopover from "@/ui/Popovers/TaskStatusPopover/TaskStatusPopover.tsx";
 import UserPopover from "@/ui/Popovers/UserPopover/UserPopover.tsx";
 import TagsPopover from "@/ui/Popovers/TagsPopover/TagsPopover.tsx";
+import DatesPopover from "@/ui/Popovers/DatesPopover/DatesPopover.tsx";
 import { useToast } from "@/hooks/useToast.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 
@@ -59,6 +60,12 @@ const TaskProperties = ({ task }: TaskPropertiesProps) => {
             name: "Tags",
             icon: "tag",
             component: <TagsPopover taskId={task.id} />,
+        },
+        {
+            id: "date",
+            name: "Dates",
+            icon: "calendar",
+            component: <DatesPopover taskId={task.id} taskDateFrom={null} taskDateTo={null} />,
         },
     ].filter(Boolean) as ColumnType[];
 
