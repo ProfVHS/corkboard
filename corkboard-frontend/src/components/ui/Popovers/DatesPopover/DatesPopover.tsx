@@ -6,7 +6,7 @@ import { Icon } from "@/ui/Icons/Icon.tsx";
 import { Input } from "@/ui/Input/Input.tsx";
 import { DayPicker, type DateRange } from "react-day-picker";
 import { useState } from "react";
-import { format, isSameYear, isSameDay, parse, isValid } from "date-fns";
+import { format, isSameYear, isSameDay, parse, isValid, startOfDay, differenceInCalendarDays } from "date-fns";
 import tasksApi from "@/api/tasks.ts";
 import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
 
@@ -14,6 +14,17 @@ const formatDate = (date?: Date | null): string => {
     if (!date) return "";
     return isSameYear(date, new Date()) ? format(date, "dd/MM") : format(date, "dd/MM/yyyy");
 };
+
+const toDate = (value?: Date | string | null): Date | undefined => {
+    if (!value) return undefined;
+    if (typeof value === "string") {
+        const d = parse(value.slice(0, 10), "yyyy-MM-dd", new Date());
+        return isValid(d) ? d : undefined;
+    }
+    return isValid(value) ? startOfDay(value) : undefined;
+};
+
+const toApi = (d?: Date) => (d ? format(d, "yyyy-MM-dd") : null);
 
 const parseDate = (text: string): Date | null => {
     const clean = text.trim().replace(/\./g, "/");
@@ -28,51 +39,71 @@ const parseDate = (text: string): Date | null => {
     return null;
 };
 
+const normalize = (from?: Date, to?: Date): DateRange => (from && to && from > to ? { from: to, to: from } : { from, to });
+
 type Field = "from" | "to";
 
 interface DatesPopoverProps {
     taskId: string;
-    taskStartDate: Date | null;
-    taskDueDate: Date | null;
+    taskStartDate: Date | string | null;
+    taskDueDate: Date | string | null;
 }
 
 const DatesPopover = ({ taskId, taskStartDate, taskDueDate }: DatesPopoverProps) => {
     const [range, setRange] = useState<DateRange | undefined>({
-        from: taskStartDate ?? undefined,
-        to: taskDueDate ?? undefined,
+        from: toDate(taskStartDate),
+        to: toDate(taskDueDate),
     });
-    const [startText, setStartText] = useState(formatDate(taskStartDate));
-    const [dueText, setDueText] = useState(formatDate(taskDueDate));
-    const [month, setMonth] = useState<Date>(taskStartDate ?? new Date());
-    const [activeField, setActiveField] = useState<Field>("from");
+    const [draft, setDraft] = useState<{ key: Field; text: string } | null>(null);
+    const [month, setMonth] = useState<Date>(toDate(taskStartDate) ?? new Date());
+    const [activeField, setActiveField] = useState<Field | null>(null);
     const updateTask = useReleaseBoardStore((state) => state.updateTask);
 
     const applyRange = (next: DateRange | undefined) => {
-        tasksApi.update(taskId, { start_date: next?.from, due_date: next?.to }, (response) => {
+        tasksApi.update(taskId, { start_date: toApi(next?.from), due_date: toApi(next?.to) }, (response) => {
             setRange(next);
+            setDraft(null);
             updateTask(taskId, response.task);
-            setStartText(formatDate(response.task.start_date));
-            setDueText(formatDate(response.task.due_date));
         });
     };
 
     const handleDayClick = (day: Date) => {
+        const { from, to } = range ?? {};
+
         if (activeField === "from") {
-            const to = range?.to && day > range.to ? undefined : range?.to;
-            applyRange({ from: day, to });
+            applyRange({ from: day, to: to && day > to ? undefined : to });
             setActiveField("to");
-        } else if (range?.from && day < range.from) {
-            applyRange({ from: day, to: range.from });
+            return;
+        }
+        if (activeField === "to") {
+            applyRange(normalize(from, day));
+            return;
+        }
+
+        if (!from) {
+            applyRange(normalize(day, to));
+            return;
+        }
+        if (!to) {
+            applyRange(normalize(from, day));
+            return;
+        }
+
+        if (day < from) {
+            applyRange({ from: day, to });
+        } else if (day > to) {
+            applyRange({ from, to: day });
         } else {
-            applyRange({ from: range?.from, to: day });
+            const closerToStart = differenceInCalendarDays(day, from) <= differenceInCalendarDays(to, day);
+            applyRange(closerToStart ? { from: day, to } : { from, to: day });
         }
     };
 
     const commitInput = (key: Field) => {
-        const text = key === "from" ? startText : dueText;
-        const current = formatDate(key === "from" ? range?.from : range?.to);
+        if (draft?.key !== key) return;
 
-        if (text === current) return;
+        const text = draft.text;
+        setDraft(null);
 
         if (!text.trim()) {
             applyRange({ from: range?.from, to: range?.to, [key]: undefined });
@@ -80,19 +111,11 @@ const DatesPopover = ({ taskId, taskStartDate, taskDueDate }: DatesPopoverProps)
         }
 
         const parsed = parseDate(text);
+        if (!parsed) return;
 
-        if (!parsed) {
-            setStartText(formatDate(range?.from));
-            setDueText(formatDate(range?.to));
-            return;
-        }
+        const next = normalize(key === "from" ? parsed : range?.from, key === "to" ? parsed : range?.to);
 
-        let from = key === "from" ? parsed : range?.from;
-        let to = key === "to" ? parsed : range?.to;
-
-        if (from && to && from > to) [from, to] = [to, from];
-
-        applyRange({ from, to });
+        applyRange(next);
         setMonth(parsed);
     };
 
@@ -120,6 +143,8 @@ const DatesPopover = ({ taskId, taskStartDate, taskDueDate }: DatesPopoverProps)
         capEnd: "cap-end",
     };
 
+    const valueFor = (key: Field) => (draft?.key === key ? draft.text : formatDate(key === "from" ? from : to));
+
     return (
         <div className="dates-popover">
             <Popover
@@ -145,8 +170,8 @@ const DatesPopover = ({ taskId, taskStartDate, taskDueDate }: DatesPopoverProps)
                             autoFocus={false}
                             className={activeField === "from" ? "active" : ""}
                             placeholder="Start date"
-                            value={startText}
-                            onChange={(e) => setStartText(e.target.value)}
+                            value={valueFor("from")}
+                            onChange={(e) => setDraft({ key: "from", text: e.target.value })}
                             onFocus={() => setActiveField("from")}
                             onClick={() => setActiveField("from")}
                             onBlur={() => commitInput("from")}
@@ -156,8 +181,8 @@ const DatesPopover = ({ taskId, taskStartDate, taskDueDate }: DatesPopoverProps)
                             autoFocus={false}
                             className={activeField === "to" ? "active" : ""}
                             placeholder="Due date"
-                            value={dueText}
-                            onChange={(e) => setDueText(e.target.value)}
+                            value={valueFor("to")}
+                            onChange={(e) => setDraft({ key: "to", text: e.target.value })}
                             onFocus={() => setActiveField("to")}
                             onClick={() => setActiveField("to")}
                             onBlur={() => commitInput("to")}

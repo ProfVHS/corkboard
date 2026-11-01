@@ -6,6 +6,8 @@
     "priority": null,
     "position": 1,
     "code_name": "UW-01",
+    "start_date": null,
+    "due_date": null,
     "tags": [],
     "user": null
   },
@@ -16,6 +18,8 @@
     "priority": null,
     "position": 2,
     "code_name": "UW-02",
+    "start_date": null,
+    "due_date": null,
     "tags": [],
     "user": null
   }

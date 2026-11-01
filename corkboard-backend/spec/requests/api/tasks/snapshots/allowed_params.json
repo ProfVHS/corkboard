@@ -3,6 +3,8 @@
   "status",
   "priority",
   "position",
+  "start_date",
+  "due_date",
   "user_id",
   "release_id",
   "workspace_id"

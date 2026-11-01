@@ -1,11 +1,11 @@
 {
   "columns": [
     {
-      "id": "adjustments",
+      "id": "ANY",
       "tasks": []
     },
     {
-      "id": "todo",
+      "id": "ANY",
       "tasks": [
         {
           "id": "ANY",
@@ -14,21 +14,23 @@
           "priority": null,
           "position": 1,
           "code_name": "UW-02",
+          "start_date": null,
+          "due_date": null,
           "tags": [],
           "user": null
         }
       ]
     },
     {
-      "id": "in_progress",
+      "id": "ANY",
       "tasks": []
     },
     {
-      "id": "review_pending",
+      "id": "ANY",
       "tasks": []
     },
     {
-      "id": "testing",
+      "id": "ANY",
       "tasks": [
         {
           "id": "ANY",
@@ -37,13 +39,15 @@
           "priority": null,
           "position": 2,
           "code_name": "UW-03",
+          "start_date": null,
+          "due_date": null,
           "tags": [],
           "user": null
         }
       ]
     },
     {
-      "id": "accepted",
+      "id": "ANY",
       "tasks": []
     }
   ]

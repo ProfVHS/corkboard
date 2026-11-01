@@ -42,7 +42,7 @@ describe "Tasks", type: :request do
 
     it "update" do
       # user can update task
-      put "/tasks/#{user1_workspace_task.id}", params: { name: "Update Name", status: "in_progress", priority: "high", order: 2, user_id: user2.id }, headers: auth_headers(user1)
+      put "/tasks/#{user1_workspace_task.id}", params: { name: "Update Name", status: "in_progress", priority: "high", start_date: "2022-10-08", due_date: "2022-10-18", order: 2, user_id: user2.id }, headers: auth_headers(user1)
       expect(response.body).to match_json_snapshot("updated_task_user1_workspace_release")
 
       # user can move task to next release
