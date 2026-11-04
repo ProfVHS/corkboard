@@ -5,6 +5,7 @@ import { usePopoverStore } from "@/store/popoverStore.ts";
 import { Button } from "@/ui/Button/Button.tsx";
 import classNames from "classnames";
 import Tooltip from "@/ui/Tooltip/Tooltip.tsx";
+import { Icon } from "@/ui/Icons/Icon.tsx";
 
 interface TriggerProps {
     ref?: React.Ref<HTMLElement>;
@@ -64,6 +65,7 @@ const PopoverItem = <T,>({ className, icon, label, value, selected, onSelect, cl
         >
             {icon}
             {label && <span className="label">{label}</span>}
+            {selected && <Icon className="close" icon="close" />}
         </Button>
     );
 };
