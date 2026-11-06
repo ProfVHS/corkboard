@@ -76,7 +76,7 @@ class TasksController < ApplicationController
 
   private
 
-  ALLOWED_PARAMS = [:name, :status, :priority, :position, :user_id, :release_id, :workspace_id]
+  ALLOWED_PARAMS = [:name, :status, :priority, :position, :start_date, :due_date, :user_id, :release_id, :workspace_id]
 
   def tasks_params
     params.permit(ALLOWED_PARAMS)

@@ -147,7 +147,8 @@
 
   &--review_pending {
     background: rgba(colors.$orange, 0.2);
-    max-height: 50%;
+    min-height: 0;
+    overflow: auto;
 
     & > .board-column__header {
       background: colors.$orange;
@@ -167,13 +168,12 @@
         border-radius: 4px;
       }
     }
-
-
   }
 
   &--testing {
-    max-height: 50%;
     background: rgba(colors.$mint, 0.2);
+    min-height: 0;
+    overflow: auto;
 
     & > .board-column__header {
       background: colors.$mint;
@@ -193,8 +193,6 @@
         border-radius: 4px;
       }
     }
-
-
   }
 
   &--accepted {

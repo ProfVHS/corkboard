@@ -7,6 +7,11 @@ RSpec::Matchers.define :match_json_snapshot do |snapshot_name|
     /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?\z/
   end
 
+  def any_key?(key)
+    k = key.to_s
+    k == "id" || k.end_with?("_id")
+  end
+
   match do |actual|
     actual = JSON.parse(actual) if actual.is_a?(String)
 
@@ -30,12 +35,14 @@ RSpec::Matchers.define :match_json_snapshot do |snapshot_name|
     json_match?(expected, actual)
   end
 
-  def auto_any(value)
+  def auto_any(value, key = nil)
+    return "ANY" if any_key?(key) && !value.is_a?(Hash) && !value.is_a?(Array)
+
     case value
     when Hash
-      value.transform_values { |v| auto_any(v) }
+      value.to_h { |k, v| [k, auto_any(v, k)] }
     when Array
-      value.map { |v| auto_any(v) }
+      value.map { |v| auto_any(v, key) }
     when String
       (value.match?(uuid_regex) || value.match?(timestamp_regex)) ? "ANY" : value
     else
@@ -77,19 +84,19 @@ RSpec::Matchers.define :match_json_snapshot do |snapshot_name|
                                  .diff(got_str, expected_str)
 
     <<~MSG
-    snapshot: #{@snapshot_name}
-    file: #{@snapshot_path}
+      snapshot: #{@snapshot_name}
+      file: #{@snapshot_path}
 
-    expected:
-    #{expected_str}
+      expected:
+      #{expected_str}
 
-    got:
-    #{got_str}
+      got:
+      #{got_str}
 
-    diff (- expected, + got):
-    #{diff}
+      diff (- expected, + got):
+      #{diff}
 
-    To accept the new output: UPDATE_SNAPSHOTS=true bundle exec rspec #{RSpec.current_example.metadata[:location]}
-  MSG
+      To accept the new output: UPDATE_SNAPSHOTS=true bundle exec rspec #{RSpec.current_example.metadata[:location]}
+    MSG
   end
 end

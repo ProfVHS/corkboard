@@ -5,9 +5,11 @@
 #  id           :uuid             not null, primary key
 #  code_name    :string
 #  code_number  :integer
+#  due_date     :date
 #  name         :string
 #  position     :integer
 #  priority     :string
+#  start_date   :date
 #  status       :string
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null

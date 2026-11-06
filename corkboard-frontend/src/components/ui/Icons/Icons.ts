@@ -26,6 +26,8 @@ import success from "./svgs/success.svg?react";
 import close from "./svgs/close.svg?react";
 import tag from "./svgs/tag.svg?react";
 import hash from "./svgs/hash.svg?react";
+import calendar from "./svgs/calendar.svg?react";
+import calendarDots from "./svgs/calendar-dots.svg?react";
 
 import bold from "./svgs/bold.svg?react";
 import italic from "./svgs/italic.svg?react";
@@ -91,4 +93,6 @@ export const icons = {
     close,
     tag,
     hash,
+    calendar,
+    calendarDots,
 };

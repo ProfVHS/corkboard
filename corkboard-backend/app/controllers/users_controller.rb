@@ -25,7 +25,7 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    User.destroy(params[:id])
+    @user.destroy!
   end
 
   private

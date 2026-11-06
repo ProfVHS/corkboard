@@ -33,8 +33,12 @@
 
     .value {
       width: 400px;
+      height: 35px;
       border-radius: 5px;
       padding: 5px;
+
+      display: flex;
+      align-items: center;
 
       &:hover {
         background-color: #181818;

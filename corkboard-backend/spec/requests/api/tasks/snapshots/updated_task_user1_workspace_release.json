@@ -1,15 +1,17 @@
 {
   "task": {
-    "position": 2,
     "status": "in_progress",
     "workspace_id": "ANY",
     "code_name": "UW-01",
     "id": "ANY",
     "code_number": 1,
     "created_at": "ANY",
+    "due_date": "2022-10-18",
     "name": "Update Name",
+    "position": 2,
     "priority": "high",
     "release_id": "ANY",
+    "start_date": "2022-10-08",
     "updated_at": "ANY",
     "user_id": "ANY"
   },

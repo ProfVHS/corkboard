@@ -130,7 +130,7 @@ export const Task = memo(({ taskId }: TaskProps) => {
                     },
                 },
             ].filter(Boolean) as ContextMenuItem[],
-        [deleteTask, moveTaskBetweenColumns, moveToBacklog, moveToNextRelease, task.status, taskId],
+        [deleteTask, moveTaskBetweenColumns, moveToBacklog, moveToNextRelease, nextRelease, task.status, taskId],
     );
 
     return (

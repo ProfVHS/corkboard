@@ -15,7 +15,9 @@
 
   .board-column{
     width: 100% !important;
+    min-height: unset;
     max-height: unset;
+    overflow: unset;
   }
 
   &__header {

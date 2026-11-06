@@ -11,8 +11,9 @@
   &__column-group {
     height: 100%;
 
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto auto;
+    align-content: start;
 
     gap: 16px;
     padding-bottom: 16px;

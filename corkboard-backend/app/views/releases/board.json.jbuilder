@@ -1,22 +1,15 @@
-json.tasks do
-  @tasks.each do |task|
-    json.set! task.id do
+grouped = @tasks.group_by(&:status)
+
+json.columns do
+  json.array!(Task.statuses.keys - ["backlog"]) do |status|
+    json.id status
+
+    json.tasks grouped.fetch(status, []) do |task|
       json.partial! "tasks/task", task: task
 
       json.user do
-        if task.user
-          json.extract! task.user, :id, :username
-        else
-          json.nil!
-        end
+        task.user ? json.extract!(task.user, :id, :username) : json.nil!
       end
     end
-  end
-end
-
-json.columns do
-  json.array!(Task.statuses.keys.select{|key| key != Task.statuses[:backlog]}) do |status|
-    json.id status
-    json.taskIds @tasks.order("tasks.position ASC").select { |task| task.status == status }.map { |task| task.id }
   end
 end

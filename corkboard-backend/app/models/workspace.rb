@@ -27,9 +27,9 @@
 
 
 class Workspace < ApplicationRecord
-  has_many :releases
-  has_many :tasks
-  has_many :documents
+  has_many :releases, dependent: :destroy
+  has_many :tasks, dependent: :destroy
+  has_many :documents, dependent: :destroy
   has_many :tags, dependent: :destroy
 
   has_and_belongs_to_many :users

@@ -19,6 +19,11 @@ const initialState = {
     overColumnId: null as string | null,
 };
 
+export type BoardColumnResponse = {
+    id: TaskStatus;
+    tasks: TaskType[];
+};
+
 interface ReleaseBoardStore {
     id: string;
     tasks: Record<string, TaskType>;
@@ -31,8 +36,8 @@ interface ReleaseBoardStore {
 
     moveTaskBetweenColumns: (activeId: string, fromColumnId: string, toColumnId: string, insertAt?: number) => void;
     reorderTaskInColumn: (columnId: string, activeId: string, insertAt: number) => void;
-    setBoard: (releaseId: string, data: { tasks?: Record<string, TaskType>; columns?: Column[] }) => void;
-    setBacklog: (data: { taskIds?: string[]; tasks?: Record<string, TaskType> }) => void;
+    setBoard: (releaseId: string, data: { columns: BoardColumnResponse[] }) => void;
+    setBacklog: (data: TaskType[]) => void;
 
     addTask: (columnId: string, task: TaskType) => void;
     updateTask: (taskId: string, task: Partial<TaskType>) => void;
@@ -59,22 +64,47 @@ export const useReleaseBoardStore = create<ReleaseBoardStore>((set, get) => ({
     overColumnId: null,
     setActiveTask: (task) => set({ activeTask: task }),
     setOverColumnId: (id) => set({ overColumnId: id }),
-    setBoard: (releaseId, { tasks = {}, columns = [] }) => {
-        set(() => ({
-            id: releaseId,
-            tasks,
-            columns,
-        }));
-    },
-    setBacklog: ({ taskIds = [], tasks = {} }) => {
+    setBoard: (releaseId, { columns }) => {
         set((state) => {
-            const exists = state.columns.some((col) => col.id === "backlog");
+            const backlogColumn = state.columns.find((c) => c.id === "backlog");
+            const tasks: Record<string, TaskType> = {};
+            backlogColumn?.taskIds.forEach((id) => {
+                if (state.tasks[id]) tasks[id] = state.tasks[id];
+            });
+
+            const newColumns: Column[] = columns.map((col) => {
+                col.tasks.forEach((task) => {
+                    tasks[task.id] = task;
+                });
+                return { id: col.id, taskIds: col.tasks.map((t) => t.id) };
+            });
 
             return {
-                tasks: { ...state.tasks, ...tasks },
+                id: releaseId,
+                tasks,
+                columns: backlogColumn ? [backlogColumn, ...newColumns] : newColumns,
+            };
+        });
+    },
+    setBacklog: (backlog) => {
+        set((state) => {
+            const tasks = { ...state.tasks };
+
+            const oldIds = state.columns.find((c) => c.id === "backlog")?.taskIds ?? [];
+            oldIds.forEach((id) => delete tasks[id]);
+
+            backlog.forEach((task) => {
+                tasks[task.id] = task;
+            });
+
+            const taskIds = backlog.map((t) => t.id);
+            const exists = state.columns.some((c) => c.id === "backlog");
+
+            return {
+                tasks,
                 columns: exists
-                    ? state.columns.map((col) => (col.id === "backlog" ? { ...col, taskIds } : col))
-                    : [...state.columns, { id: "backlog", taskIds }],
+                    ? state.columns.map((c) => (c.id === "backlog" ? { ...c, taskIds } : c))
+                    : [{ id: "backlog" as TaskStatus, taskIds }, ...state.columns],
             };
         });
     },
