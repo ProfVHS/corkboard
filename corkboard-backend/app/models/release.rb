@@ -29,6 +29,8 @@ class Release < ApplicationRecord
   before_save :defaults
   before_save :set_current
 
+  after_destroy :promote_next_current, if: :current
+
   default_scope { where(completed: false) }
   acts_as_list scope: [:workspace_id, :status], top_of_list: 0
 
@@ -56,7 +58,13 @@ class Release < ApplicationRecord
   end
 
   def next_release
-    Release.find_by(workspace_id: self.workspace_id, position: self.position + 1)
+    return unless status == QUEUED
+
+    workspace.releases
+             .where(status: QUEUED)
+             .where("releases.position > ?", position)
+             .order(:position)
+             .first
   end
 
   def set_current
@@ -75,24 +83,19 @@ class Release < ApplicationRecord
     end
   end
 
+  def promote_next_current
+    return if Release.exists?(workspace_id: workspace_id, current: true)
+
+    Release.where(workspace_id: workspace_id, status: QUEUED)
+           .where.not(id: id)
+           .order(:position)
+           .first
+      &.update_columns(current: true)
+  end
+
   def defaults
     self.completed ||= false
     self.current ||= false
     self.status ||= NOT_QUEUED
-  end
-
-  def broadcast(type, current_user)
-    ActionCable.server.broadcast "workspace_#{self.workspace_id}", {
-      type: type,
-      actor_id: current_user.id,
-      release: {
-        id: self.id,
-        name: self.name,
-        status: self.status,
-        position: self.position,
-        current: self.current,
-        progress: self.progress
-      }
-    }
   end
 end

@@ -11,30 +11,8 @@ import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import { EditReleaseModal } from "./EditReleaseModal.tsx";
 import releasesApi from "@/api/releases.ts";
-import { cable } from "@/lib/cable.ts";
 import { useAuth } from "@/context/auth/useAuth.ts";
-
-type ReleaseEvent =
-    | {
-          type: "release_created";
-          actor_id: string;
-          release: ReleaseType;
-      }
-    | {
-          type: "release_updated";
-          actor_id: string;
-          release: ReleaseType;
-      }
-    | {
-          type: "release_deleted";
-          actor_id: string;
-          release: ReleaseType;
-      }
-    | {
-          type: "release_moved";
-          actor_id: string;
-          releases: ReleaseType[];
-      };
+import useWorkspaceSubscription from "@/store/useWorkspaceSubscription.ts";
 
 export const ReleasesPage = () => {
     const [showCreateReleaseModal, setShowCreateReleaseModal] = useState<boolean>(false);
@@ -79,48 +57,7 @@ export const ReleasesPage = () => {
         });
     }, [workspaceId]);
 
-    useEffect(() => {
-        if (!user) return;
-
-        const subscription = cable.subscriptions.create(
-            {
-                channel: "WorkspaceChannel",
-                workspace_id: workspaceId,
-            },
-            {
-                connected() {
-                    console.log("Connected to Workspace");
-                },
-                disconnected: () => {
-                    console.log("Disconnected from Workspace");
-                },
-                received: (event: ReleaseEvent) => {
-                    if (event.actor_id !== user.id) {
-                        switch (event.type) {
-                            case "release_created":
-                                setReleases((prev) => [...prev, event.release]);
-                                break;
-                            case "release_updated":
-                                setReleases((prev) => prev.map((r) => (r.id === event.release.id ? event.release : r)));
-                                break;
-                            case "release_deleted":
-                                setReleases((prev) => prev.filter((r) => r.id !== event.release.id));
-                                break;
-                            case "release_moved":
-                                setReleases(event.releases);
-                                break;
-                            default:
-                                console.error(event);
-                        }
-                    }
-                },
-            },
-        );
-
-        return () => {
-            subscription.unsubscribe();
-        };
-    }, [releases, user, workspaceId]);
+    useWorkspaceSubscription(workspaceId ?? null, user?.id ?? null, (response) => setReleases(response));
 
     if (loading) return <Loading overlay={true} />;
 

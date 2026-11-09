@@ -38,12 +38,6 @@ export const Release = ({ release, onDeleteClick, onEditClick, isNotDraggable }:
                 onClick: () => onEditClick(),
             },
             {
-                type: "button",
-                label: "Select as Current",
-                icon: "exclamationMark",
-                onClick: () => {},
-            },
-            {
                 type: "hr",
             },
             {
