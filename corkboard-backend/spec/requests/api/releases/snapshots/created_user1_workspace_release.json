@@ -7,5 +7,6 @@
   "progress": {
     "tasks": 0,
     "accepted_tasks": 0
-  }
+  },
+  "next": false
 }
