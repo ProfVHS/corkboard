@@ -22,4 +22,19 @@
 class WorkspaceInvitation < ApplicationRecord
   belongs_to :workspace
   belongs_to :user, foreign_key: :invited_by_user_id
+
+  def as_workspace_broadcast
+    {
+      id: invited_user_id,
+      username: User.find(invited_user_id).username
+    }
+  end
+
+  def as_user_broadcast
+    {
+      id: id,
+      invited_by: User.find(invited_by_user_id).username,
+      workspace: { id: workspace_id, name: workspace.name }
+    }
+  end
 end

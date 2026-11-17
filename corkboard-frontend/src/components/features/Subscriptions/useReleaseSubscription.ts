@@ -20,7 +20,7 @@ type ReleaseEvent =
           task: TaskType;
       };
 
-export const useReleaseSubscription = (releaseId: string | null, userId: string | null) => {
+const useReleaseSubscription = (releaseId: string | null) => {
     const applyTaskCreated = useReleaseBoardStore((state) => state.applyTaskCreated);
     const applyTaskDestroyed = useReleaseBoardStore((state) => state.applyTaskDestroyed);
     const applyTaskUpdated = useReleaseBoardStore((state) => state.applyTaskUpdated);
@@ -41,20 +41,18 @@ export const useReleaseSubscription = (releaseId: string | null, userId: string 
                     console.log("Disconnected from Release", releaseId);
                 },
                 received: (event: ReleaseEvent) => {
-                    if (event.actor_id !== userId) {
-                        switch (event.type) {
-                            case "task_created":
-                                applyTaskCreated(event.task);
-                                break;
-                            case "task_destroyed":
-                                applyTaskDestroyed(event.task.id);
-                                break;
-                            case "task_updated":
-                                applyTaskUpdated(event.task);
-                                break;
-                            default:
-                                console.error(event);
-                        }
+                    switch (event.type) {
+                        case "task_created":
+                            applyTaskCreated(event.task);
+                            break;
+                        case "task_destroyed":
+                            applyTaskDestroyed(event.task.id);
+                            break;
+                        case "task_updated":
+                            applyTaskUpdated(event.task);
+                            break;
+                        default:
+                            console.error(event);
                     }
                 },
             },
@@ -63,5 +61,7 @@ export const useReleaseSubscription = (releaseId: string | null, userId: string 
         return () => {
             subscription.unsubscribe();
         };
-    }, [applyTaskCreated, applyTaskDestroyed, applyTaskUpdated, releaseId, userId]);
+    }, [releaseId]);
 };
+
+export default useReleaseSubscription;

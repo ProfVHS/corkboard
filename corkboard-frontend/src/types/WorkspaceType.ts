@@ -10,3 +10,12 @@ export type WorkspaceType = {
     code_prefix_enabled: boolean;
     auto_assign?: boolean;
 };
+
+export type WorkspaceInvitationType = {
+    id: string;
+    invited_by: string;
+    workspace: {
+        id: string;
+        name: string;
+    };
+};

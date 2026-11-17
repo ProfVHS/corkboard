@@ -1,4 +1,4 @@
-class WorkspaceBroadcaster
+class WorkspaceBroadcaster < ApplicationBroadcaster
   def self.releases_changed(workspace_id, type:, actor_id:)
     releases = Release.where(workspace_id: workspace_id)
                       .includes(:tasks)
@@ -18,9 +18,7 @@ class WorkspaceBroadcaster
     })
   end
 
-  def self.broadcast(workspace_id, payload)
-    ActionCable.server.broadcast("workspace_#{workspace_id}", payload)
+  def self.broadcast(workspace_id, type, actor_id: nil, **payload)
+    publish("workspace_#{workspace_id}", type, payload, actor_id)
   end
-
-  private_class_method :broadcast
 end

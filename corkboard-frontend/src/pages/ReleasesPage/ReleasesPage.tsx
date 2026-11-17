@@ -11,23 +11,22 @@ import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import { EditReleaseModal } from "./EditReleaseModal.tsx";
 import releasesApi from "@/api/releases.ts";
-import { useAuth } from "@/context/auth/useAuth.ts";
-import useWorkspaceSubscription from "@/store/useWorkspaceSubscription.ts";
+import useWorkspaceSubscription from "@/features/Subscriptions/useWorkspaceSubscription.ts";
+import useReleasesStore from "@/store/releasesStore.ts";
 
 export const ReleasesPage = () => {
     const [showCreateReleaseModal, setShowCreateReleaseModal] = useState<boolean>(false);
     const [releaseToDelete, setReleaseToDelete] = useState<ReleaseType | null>(null);
     const [releaseToEdit, setReleaseToEdit] = useState<ReleaseType | null>(null);
-    const [releases, setReleases] = useState<ReleaseType[]>([]);
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
+    const releases = useReleasesStore((state) => state.releases);
+    const setReleases = useReleasesStore((state) => state.setReleases);
     const [loading, setLoading] = useState<boolean>(true);
-    const { user } = useAuth();
 
     const handleSave = (data: { name: string }) => {
         if (!workspaceId) return;
 
-        releasesApi.create({ name: data.name, workspace_id: workspaceId, status: "NOT_QUEUED" }, (response) => {
-            setReleases((prev) => [...prev, response]);
+        releasesApi.create({ name: data.name, workspace_id: workspaceId, status: "NOT_QUEUED" }, () => {
             setShowCreateReleaseModal(false);
         });
     };
@@ -36,14 +35,12 @@ export const ReleasesPage = () => {
         if (!releaseToDelete) return;
 
         releasesApi.delete(releaseToDelete.id, () => {
-            setReleases((prev) => prev.filter((r) => r.id !== releaseToDelete.id));
             setReleaseToDelete(null);
         });
     };
 
     const handleEdit = (releaseId: string, name: string) => {
-        releasesApi.update(releaseId, { name }, (response) => {
-            setReleases((prev) => prev.map((r) => (r.id === response.id ? response : r)));
+        releasesApi.update(releaseId, { name }, () => {
             setReleaseToEdit(null);
         });
     };
@@ -57,7 +54,7 @@ export const ReleasesPage = () => {
         });
     }, [workspaceId]);
 
-    useWorkspaceSubscription(workspaceId ?? null, user?.id ?? null, (response) => setReleases(response));
+    useWorkspaceSubscription(workspaceId ?? null);
 
     if (loading) return <Loading overlay={true} />;
 

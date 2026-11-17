@@ -1,6 +1,6 @@
 class WorkspacesController < ApplicationController
   before_action :authenticate_user!
-  load_and_authorize_resource :workspace, except: :accept_invitation
+  load_and_authorize_resource :workspace, except: [:accept_invitation, :decline_invitation]
 
   def index
     @workspaces = current_user.workspaces
@@ -34,9 +34,18 @@ class WorkspacesController < ApplicationController
     @invited_users = User.where(id: invited_user_ids)
   end
 
+  def backlog
+    @tasks = Task.where(workspace_id: @workspace.id, status: Task.statuses[:backlog], release_id: nil)
+  end
+
+  def invitation
+    @invitation = WorkspaceInvitation.where(invited_user_id: current_user.id)
+  end
+
   def invite_user
     username = params[:username]
-    @user = User.find_by(username: username)
+    workspace_id = params[:id]
+    @user = User.find_by!(username: username)
     return render json: { message: "User #{username} not found!" } if @user.nil?
 
     already_in_workspace = UsersWorkspaces.find_by(workspace_id: params[:id], user_id: @user&.id)
@@ -45,34 +54,46 @@ class WorkspacesController < ApplicationController
     already_invited = WorkspaceInvitation.find_by(invited_user_id: @user&.id, workspace_id: params[:id])
     return render json: { message: "User #{username} is already invited!" } if already_invited
 
-    WorkspaceInvitation.create!(invited_user_id: @user&.id, workspace_id: params[:id], invited_by_user_id: current_user.id, status: "PENDING")
+    @invitation = WorkspaceInvitation.create!(invited_user_id: @user&.id, workspace_id: params[:id], invited_by_user_id: current_user.id, status: "PENDING")
+    UserBroadcaster.broadcast(@user&.id, "send_workspace_invite", invitation: @invitation.as_user_broadcast)
+    WorkspaceBroadcaster.broadcast(workspace_id, "send_workspace_invite", invitedUser: @invitation.as_workspace_broadcast)
   end
 
-  def invitation
-    @invitation = WorkspaceInvitation.where(invited_user_id: current_user.id)
-  end
+  def cancel_invitation
+    @invitation = WorkspaceInvitation.find_by!(invited_user_id: params[:invited_user_id], workspace_id: params[:id])
+    payload = @invitation
+    @invitation.destroy!
 
-  def backlog
-    @tasks = Task.where(workspace_id: @workspace.id, status: Task.statuses[:backlog], release_id: nil)
+    WorkspaceBroadcaster.broadcast(params[:id], "cancel_workspace_invite", invitedUser: payload.as_workspace_broadcast)
+    UserBroadcaster.broadcast(params[:invited_user_id], "cancel_workspace_invite", invitation: payload.as_user_broadcast)
+    render json: { message: "Successfully cancel invitation" }, status: :ok
   end
 
   def accept_invitation
     invitation = WorkspaceInvitation.find_by(invited_user_id: current_user.id, workspace_id: params[:id])
     authorize! :accept, invitation
 
-    invitation.destroy! if invitation
-    UsersWorkspaces.create!(workspace_id: params[:id], user_id: current_user.id)
-    @workspace = invitation&.workspace
+    if invitation
+      payload = invitation.as_workspace_broadcast
+      UsersWorkspaces.create!(workspace_id: params[:id], user_id: current_user.id)
+      @workspace = invitation.workspace
+      invitation.destroy!
+    end
+
+    WorkspaceBroadcaster.broadcast(params[:id], "accept_workspace_invite", invitedUser: payload)
   end
 
   def decline_invitation
-    WorkspaceInvitation.where(invited_user_id: current_user.id, workspace_id: params[:id]).delete_all
-    render json: { message: "Decline invitation to #{params[:name]}" }, status: :ok
-  end
+    invitation = WorkspaceInvitation.find_by(invited_user_id: current_user.id, workspace_id: params[:id])
+    authorize! :decline, invitation
 
-  def cancel_invitation
-    WorkspaceInvitation.where(invited_user_id: params[:invited_user_id], workspace_id: params[:id]).delete_all
-    render json: { message: "Successfully cancel invitation" }, status: :ok
+    if invitation
+      payload = invitation.as_workspace_broadcast
+      invitation.destroy!
+    end
+
+    WorkspaceBroadcaster.broadcast(params[:id], "decline_workspace_invite", invitedUser: payload)
+    render json: { message: "Decline invitation to #{params[:name]}" }, status: :ok
   end
 
   def delete_user

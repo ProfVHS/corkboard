@@ -112,11 +112,11 @@ export const Navbar = () => {
                 </>
             )}
 
-            {user && (
+            {user && workspace && (
                 <>
                     <div className="user">
                         <ProfilePopover />
-                        <UserNotifications updateWorkspaces={(workspace: WorkspaceType) => workspaces.push(workspace)} />
+                        <UserNotifications workspaceId={workspace.id} updateWorkspaces={(workspace: WorkspaceType) => workspaces.push(workspace)} />
                     </div>
                 </>
             )}

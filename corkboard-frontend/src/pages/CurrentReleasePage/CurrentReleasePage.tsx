@@ -4,14 +4,11 @@ import { useEffect, useState } from "react";
 import { ReleaseBoard } from "@/features/ReleaseBoard/ReleaseBoard.tsx";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import { Page } from "@/layout/Page/Page.tsx";
-import { useReleaseSubscription } from "@/store/useReleaseSubscription.ts";
-import { useAuth } from "@/context/auth/useAuth.ts";
 import Loading from "@/ui/Loading/Loading.tsx";
 import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import releasesApi from "@/api/releases.ts";
 import workspacesApi from "@/api/workspaces.ts";
 import CompleteReleaseModal, { type NotAcceptedTasksAction } from "@/pages/CurrentReleasePage/CompleteReleaseModal.tsx";
-import useWorkspaceSubscription from "@/store/useWorkspaceSubscription.ts";
 
 export const CurrentReleasePage = () => {
     const currentRelease = useWorkspaceStore((state) => state.currentRelease);
@@ -20,10 +17,6 @@ export const CurrentReleasePage = () => {
     const [showCreateReleaseModal, setShowCreateReleaseModal] = useState(false);
     const [showCompleteReleaseModal, setShowCompleteReleaseModal] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
-    const { user } = useAuth();
-
-    useReleaseSubscription(currentRelease ? currentRelease.id : null, user ? user.id : null);
-    useWorkspaceSubscription(workspaceId ?? null, user?.id ?? null);
 
     useEffect(() => {
         if (!workspaceId) return;

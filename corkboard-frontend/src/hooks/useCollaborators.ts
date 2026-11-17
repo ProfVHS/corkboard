@@ -2,15 +2,16 @@ import { useCallback, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api";
 import type { User } from "@/context/auth/types.ts";
+import { workspaceKeys } from "./queryKeys";
 
 export type CollaboratorsResponse = {
     collaborators: User[];
     invited_users: User[];
 };
 
-export const workspaceKeys = {
-    collaborators: (workspaceId?: string) => ["workspaces", workspaceId, "collaborators"] as const,
-};
+const selectAll = (d: CollaboratorsResponse) => d;
+const selectCollaborators = (d: CollaboratorsResponse) => d.collaborators;
+const selectInvitedUsers = (d: CollaboratorsResponse) => d.invited_users;
 
 function useCollaboratorsQuery<T>(workspaceId: string | undefined, select: (data: CollaboratorsResponse) => T) {
     return useQuery({
@@ -25,27 +26,17 @@ function useCollaboratorsQuery<T>(workspaceId: string | undefined, select: (data
     });
 }
 
-export function useCollaborators(workspaceId?: string) {
-    return useCollaboratorsQuery(workspaceId, (d) => d.collaborators);
-}
-
-export function useInvitedUsers(workspaceId?: string) {
-    return useCollaboratorsQuery(workspaceId, (d) => d.invited_users);
-}
-
-export function useCollaboratorsData(workspaceId?: string) {
-    return useCollaboratorsQuery(workspaceId, (d) => d);
-}
+export const useCollaborators = (workspaceId?: string) => useCollaboratorsQuery(workspaceId, selectCollaborators);
+export const useInvitedUsers = (workspaceId?: string) => useCollaboratorsQuery(workspaceId, selectInvitedUsers);
+export const useCollaboratorsData = (workspaceId?: string) => useCollaboratorsQuery(workspaceId, selectAll);
 
 export function useCollaboratorsCache(workspaceId?: string) {
     const queryClient = useQueryClient();
-    const key = workspaceKeys.collaborators(workspaceId);
 
     const update = useCallback(
         (fn: (old: CollaboratorsResponse) => CollaboratorsResponse) => {
-            queryClient.setQueryData<CollaboratorsResponse>(key, (old) => (old ? fn(old) : old));
+            queryClient.setQueryData<CollaboratorsResponse>(workspaceKeys.collaborators(workspaceId), (old) => (old ? fn(old) : old));
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [queryClient, workspaceId],
     );
 
@@ -76,10 +67,8 @@ export function useCollaboratorsCache(workspaceId?: string) {
                     ...old,
                     invited_users: old.invited_users.filter((u) => u.id !== userId),
                 })),
-            setAll: (data: CollaboratorsResponse) => queryClient.setQueryData<CollaboratorsResponse>(key, data),
-            refetch: () => queryClient.invalidateQueries({ queryKey: key }),
+            refetch: () => queryClient.invalidateQueries({ queryKey: workspaceKeys.collaborators(workspaceId) }),
         }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [update, queryClient, workspaceId],
     );
 }

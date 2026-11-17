@@ -3,13 +3,17 @@ import { Button } from "@/ui/Button/Button.tsx";
 import { Icon } from "@/ui/Icons/Icon.tsx";
 import type { WorkspaceType } from "@/types/WorkspaceType.ts";
 import useUserNotification from "./useUserNotification.ts";
+import { useMyInvitations } from "@/hooks/useMyInvitations.ts";
 
 interface UserNotificationsProps {
+    workspaceId: string;
     updateWorkspaces: (workspace: WorkspaceType) => void;
 }
 
-export const UserNotifications = ({ updateWorkspaces }: UserNotificationsProps) => {
-    const { showNotifications, setShowNotifications, invitations, triggerRef, menuRef, acceptInvitation, declineInvitation } = useUserNotification({
+export const UserNotifications = ({ workspaceId, updateWorkspaces }: UserNotificationsProps) => {
+    const { data: invitations = [] } = useMyInvitations();
+    const { showNotifications, setShowNotifications, triggerRef, menuRef, acceptInvitation, declineInvitation } = useUserNotification({
+        workspaceId,
         updateWorkspaces,
     });
 
@@ -21,8 +25,8 @@ export const UserNotifications = ({ updateWorkspaces }: UserNotificationsProps) 
                         <Icon icon="bell" />
                         <span>Notifications</span>
                     </div>
-                    {invitations.map((invitation) => (
-                        <div className="notification">
+                    {invitations.map((invitation, index) => (
+                        <div key={index} className="notification">
                             <div className="user-notifications__message">
                                 {invitation.invited_by} invited you to {invitation.workspace.name}
                             </div>
