@@ -85,12 +85,12 @@ const WorkspaceUsers = () => {
                             header: "Options",
                             render: (_, row) => (
                                 <>
-                                    {workspace?.owner.id === user?.id && user?.id !== row.id && (
+                                    {workspace?.owner?.id === user?.id && user?.id !== row.id && (
                                         <>
                                             <Button icon="trash" variant="icon" size="small" color="outlined" onClick={() => setUserToDelete(row)} />
                                         </>
                                     )}
-                                    {workspace?.owner.id !== user?.id && user?.id === row.id && (
+                                    {workspace?.owner?.id !== user?.id && user?.id === row.id && (
                                         <>
                                             <Button icon="doorOpen" variant="icon" size="small" color="outlined" onClick={() => setUserToLeave(row)} />
                                         </>

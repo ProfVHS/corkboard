@@ -1,16 +1,20 @@
 import { useEffect } from "react";
 import { cable } from "@/lib/cable.ts";
-import type { WorkspaceInvitationType } from "@/types/WorkspaceType.ts";
+import type { WorkspaceInvitationType, WorkspaceType } from "@/types/WorkspaceType.ts";
 import { useMyInvitationsCache } from "@/hooks/useMyInvitations.ts";
+import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 
-type UserEvent = {
-    type: "send_workspace_invite" | "cancel_workspace_invite" | "decline_workspace_invite" | "accept_workspace_invite";
-    actor_id: string;
-    invitation: WorkspaceInvitationType;
-};
+type UserEvent =
+    | {
+          type: "send_workspace_invite" | "cancel_workspace_invite";
+          actor_id: string;
+          invitation: WorkspaceInvitationType;
+      }
+    | { type: "delete_user"; actor_id: string; workspace: WorkspaceType };
 
 const useUserSubscription = (userId: string | null) => {
     const { addInvitation, removeInvitation } = useMyInvitationsCache();
+    const setWorkspace = useWorkspaceStore((state) => state.setWorkspace);
 
     useEffect(() => {
         if (!userId) return;
@@ -35,9 +39,8 @@ const useUserSubscription = (userId: string | null) => {
                         case "cancel_workspace_invite":
                             removeInvitation(event.invitation.workspace.id);
                             break;
-                        case "accept_workspace_invite":
-                            break;
-                        case "decline_workspace_invite":
+                        case "delete_user":
+                            setWorkspace(event.workspace);
                             break;
                         default:
                             break;

@@ -97,13 +97,20 @@ class WorkspacesController < ApplicationController
   end
 
   def delete_user
+    user = User.find(params[:user_id])
     UsersWorkspaces.where(workspace_id: params[:id], user_id: params[:user_id]).delete_all
+    @workspace = user.workspaces.first
+
+    WorkspaceBroadcaster.broadcast(params[:id], "delete_user", user: user)
+    UserBroadcaster.broadcast(user.id, "delete_user", workspace: @workspace)
     render json: { message: "User #{params[:username]} was removed from the workspace" }, status: :ok
   end
 
   def leave_workspace
     UsersWorkspaces.where(workspace_id: params[:id], user_id: current_user.id).delete_all
     @workspace = current_user.workspaces.first
+
+    WorkspaceBroadcaster.broadcast(params[:id], "leave_workspace", user: current_user)
   end
 
   def current_release

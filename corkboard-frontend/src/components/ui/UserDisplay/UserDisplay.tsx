@@ -14,7 +14,7 @@ export const UserDisplay = ({ user }: UserDisplayProps) => {
         <div className="user-display">
             <UserAvatar username={user.username} />
             <span>{user.username}</span>
-            {workspace?.owner.id === user.id && <span className="owner-badge">Owner</span>}
+            {workspace?.owner?.id === user.id && <span className="owner-badge">Owner</span>}
         </div>
     );
 };
