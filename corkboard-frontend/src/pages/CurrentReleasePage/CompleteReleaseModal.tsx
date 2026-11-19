@@ -2,7 +2,7 @@ import "./CompleteReleaseModal.scss";
 import Modal from "@/ui/Modal/Modal.tsx";
 import { Button } from "@/ui/Button/Button.tsx";
 import { useState } from "react";
-import { useNextRelease } from "@/hooks/useReleases.ts";
+import { useNextRelease } from "@/query/useReleases.ts";
 
 export type NotAcceptedTasksAction = "accepted" | "next_release" | "backlog";
 

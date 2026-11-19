@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api";
 import type { ReleaseType } from "@/types/ReleaseType.ts";
-import { releaseKeys } from "./queryKeys";
+import { releaseKeys } from "./queryKeys.ts";
 
 const selectAll = (d: ReleaseType[]) => d;
 const selectCurrent = (d: ReleaseType[]) => d.find((r) => r.current) ?? null;

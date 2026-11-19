@@ -3,7 +3,7 @@ import useUserSubscription from "@/features/Subscriptions/useUserSubscription.ts
 import useWorkspaceSubscription from "@/features/Subscriptions/useWorkspaceSubscription.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import { useAuth } from "@/context/auth/useAuth.ts";
-import { useCurrentRelease } from "@/hooks/useReleases.ts";
+import { useCurrentRelease } from "@/query/useReleases.ts";
 
 const Subscriptions = () => {
     const workspaceId = useWorkspaceStore((s) => s.workspace?.id);

@@ -9,7 +9,7 @@ import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import releasesApi from "@/api/releases.ts";
 import workspacesApi from "@/api/workspaces.ts";
 import CompleteReleaseModal, { type NotAcceptedTasksAction } from "@/pages/CurrentReleasePage/CompleteReleaseModal.tsx";
-import { useCurrentRelease } from "@/hooks/useReleases.ts";
+import { useCurrentRelease } from "@/query/useReleases.ts";
 
 export const CurrentReleasePage = () => {
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);

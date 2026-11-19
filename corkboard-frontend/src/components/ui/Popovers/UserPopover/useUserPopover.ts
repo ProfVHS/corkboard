@@ -1,7 +1,7 @@
 import type { User } from "@/context/auth/types.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
-import { useCollaborators } from "@/hooks/useCollaborators.ts";
+import { useCollaborators } from "@/query/useCollaborators.ts";
 import tasksApi from "@/api/tasks.ts";
 
 interface useUserPopoverProps {

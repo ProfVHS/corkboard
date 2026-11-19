@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { cable } from "@/lib/cable.ts";
-import { useCollaboratorsCache } from "@/hooks/useCollaborators.ts";
+import { useCollaboratorsCache } from "@/query/useCollaborators.ts";
 import type { User } from "@/context/auth/types.ts";
 import type { ReleaseType } from "@/types/ReleaseType.ts";
-import { useReleasesCache } from "@/hooks/useReleases.ts";
+import { useReleasesCache } from "@/query/useReleases.ts";
 
 type WorkspaceEvent =
     | {
@@ -47,8 +47,6 @@ const useWorkspaceSubscription = (workspaceId?: string | null) => {
                     console.log("Disconnected from Workspace", workspaceId);
                 },
                 received: (event: WorkspaceEvent) => {
-                    console.log(event);
-
                     switch (event.type) {
                         case "send_workspace_invite":
                             addInvitedUser(event.invitedUser);
@@ -78,6 +76,7 @@ const useWorkspaceSubscription = (workspaceId?: string | null) => {
                             setReleases(event.releases);
                             break;
                         default:
+                            console.error(event);
                             break;
                     }
                 },

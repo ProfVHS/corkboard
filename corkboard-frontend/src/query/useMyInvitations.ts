@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api";
 import type { WorkspaceInvitationType } from "@/types/WorkspaceType.ts";
-import { invitationKeys } from "./queryKeys";
+import { invitationKeys } from "./queryKeys.ts";
 
 export function useMyInvitations() {
     return useQuery({

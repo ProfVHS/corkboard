@@ -14,7 +14,7 @@ import Tag from "@/ui/Tag/Tag.tsx";
 import { useAuth } from "@/context/auth/useAuth.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import tasksApi from "@/api/tasks.ts";
-import { useNextRelease } from "@/hooks/useReleases.ts";
+import { useNextRelease } from "@/query/useReleases.ts";
 
 type TaskProps = {
     taskId: string;

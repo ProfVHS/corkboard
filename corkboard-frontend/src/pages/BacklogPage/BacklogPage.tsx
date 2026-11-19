@@ -9,7 +9,7 @@ import { useShallow } from "zustand/react/shallow";
 import Loading from "@/ui/Loading/Loading.tsx";
 import workspacesApi from "@/api/workspaces.ts";
 import releasesApi from "@/api/releases.ts";
-import { useCurrentRelease } from "@/hooks/useReleases.ts";
+import { useCurrentRelease } from "@/query/useReleases.ts";
 
 export const BacklogPage = () => {
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);

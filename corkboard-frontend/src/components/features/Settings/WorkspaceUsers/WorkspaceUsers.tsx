@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/useToast.ts";
 import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 import workspacesApi from "@/api/workspaces.ts";
-import { useCollaborators, useCollaboratorsCache, useInvitedUsers } from "@/hooks/useCollaborators.ts";
+import { useCollaborators, useCollaboratorsCache, useInvitedUsers } from "@/query/useCollaborators.ts";
 
 const WorkspaceUsers = () => {
     const [showInviteModal, setShowInviteModal] = useState(false);

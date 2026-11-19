@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api";
 import type { User } from "@/context/auth/types.ts";
-import { workspaceKeys } from "./queryKeys";
+import { workspaceKeys } from "./queryKeys.ts";
 
 export type CollaboratorsResponse = {
     collaborators: User[];

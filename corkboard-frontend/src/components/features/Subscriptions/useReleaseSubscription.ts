@@ -3,22 +3,11 @@ import { useEffect } from "react";
 import { cable } from "@/lib/cable.ts";
 import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
 
-type ReleaseEvent =
-    | {
-          type: "task_created";
-          actor_id: string;
-          task: TaskType;
-      }
-    | {
-          type: "task_updated";
-          actor_id: string;
-          task: TaskType;
-      }
-    | {
-          type: "task_destroyed";
-          actor_id: string;
-          task: TaskType;
-      };
+type ReleaseEvent = {
+    type: "create_task" | "update_task" | "delete_task" | "move_to_next_task";
+    actor_id: string;
+    task: TaskType;
+};
 
 const useReleaseSubscription = (releaseId?: string | null) => {
     const applyTaskCreated = useReleaseBoardStore((state) => state.applyTaskCreated);
@@ -42,17 +31,19 @@ const useReleaseSubscription = (releaseId?: string | null) => {
                 },
                 received: (event: ReleaseEvent) => {
                     switch (event.type) {
-                        case "task_created":
+                        case "create_task":
                             applyTaskCreated(event.task);
                             break;
-                        case "task_destroyed":
-                            applyTaskDestroyed(event.task.id);
-                            break;
-                        case "task_updated":
+                        case "update_task":
                             applyTaskUpdated(event.task);
+                            break;
+                        case "delete_task":
+                        case "move_to_next_task":
+                            applyTaskDestroyed(event.task.id);
                             break;
                         default:
                             console.error(event);
+                            break;
                     }
                 },
             },

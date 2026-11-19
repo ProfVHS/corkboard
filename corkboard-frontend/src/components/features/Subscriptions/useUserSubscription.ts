@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { cable } from "@/lib/cable.ts";
 import type { WorkspaceInvitationType, WorkspaceType } from "@/types/WorkspaceType.ts";
-import { useMyInvitationsCache } from "@/hooks/useMyInvitations.ts";
+import { useMyInvitationsCache } from "@/query/useMyInvitations.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 
 type UserEvent =
@@ -43,6 +43,7 @@ const useUserSubscription = (userId?: string | null) => {
                             setWorkspace(event.workspace);
                             break;
                         default:
+                            console.error(event);
                             break;
                     }
                 },

@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/useToast.ts";
 import { useParams } from "react-router-dom";
 import type { User } from "@/context/auth/types.ts";
 import workspacesApi from "@/api/workspaces.ts";
-import { useCollaboratorsCache } from "@/hooks/useCollaborators.ts";
+import { useCollaboratorsCache } from "@/query/useCollaborators.ts";
 
 type WorkspaceUserProps = {
     user: User;

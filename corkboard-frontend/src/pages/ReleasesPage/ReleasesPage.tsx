@@ -11,7 +11,7 @@ import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import { EditReleaseModal } from "./EditReleaseModal.tsx";
 import releasesApi from "@/api/releases.ts";
-import { useReleases, useReleasesCache } from "@/hooks/useReleases.ts";
+import { useReleases, useReleasesCache } from "@/query/useReleases.ts";
 
 export const ReleasesPage = () => {
     const [showCreateReleaseModal, setShowCreateReleaseModal] = useState<boolean>(false);

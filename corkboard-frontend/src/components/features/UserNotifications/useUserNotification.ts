@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/useToast.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import type { WorkspaceType } from "@/types/WorkspaceType.ts";
 import workspacesApi from "@/api/workspaces.ts";
-import { useMyInvitationsCache } from "@/hooks/useMyInvitations.ts";
+import { useMyInvitationsCache } from "@/query/useMyInvitations.ts";
 
 interface UseUserNotificationProps {
     workspaceId: string;

@@ -3,7 +3,7 @@ import { Button } from "@/ui/Button/Button.tsx";
 import { Icon } from "@/ui/Icons/Icon.tsx";
 import type { WorkspaceType } from "@/types/WorkspaceType.ts";
 import useUserNotification from "./useUserNotification.ts";
-import { useMyInvitations } from "@/hooks/useMyInvitations.ts";
+import { useMyInvitations } from "@/query/useMyInvitations.ts";
 
 interface UserNotificationsProps {
     workspaceId: string;
