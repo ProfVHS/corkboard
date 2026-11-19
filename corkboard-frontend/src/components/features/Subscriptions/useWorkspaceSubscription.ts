@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { cable } from "@/lib/cable.ts";
 import { useCollaboratorsCache } from "@/hooks/useCollaborators.ts";
 import type { User } from "@/context/auth/types.ts";
+import type { ReleaseType } from "@/types/ReleaseType.ts";
+import { useReleasesCache } from "@/hooks/useReleases.ts";
 
 type WorkspaceEvent =
     | {
@@ -13,10 +15,21 @@ type WorkspaceEvent =
           type: "leave_workspace" | "delete_user";
           actor_id: string;
           user: User;
+      }
+    | {
+          type: "create_release" | "update_release";
+          actor_id: string;
+          release: ReleaseType;
+      }
+    | {
+          type: "delete_release" | "move_release" | "complete_release" | "create_current_release";
+          actor_id: string;
+          releases: ReleaseType[];
       };
 
-const useWorkspaceSubscription = (workspaceId: string | null) => {
+const useWorkspaceSubscription = (workspaceId?: string | null) => {
     const { addInvitedUser, removeInvitedUser, addCollaborator, removeCollaborator } = useCollaboratorsCache(workspaceId!);
+    const { addRelease, updateRelease, setReleases } = useReleasesCache(workspaceId!);
 
     useEffect(() => {
         if (!workspaceId) return;
@@ -40,21 +53,29 @@ const useWorkspaceSubscription = (workspaceId: string | null) => {
                         case "send_workspace_invite":
                             addInvitedUser(event.invitedUser);
                             break;
-                        case "cancel_workspace_invite":
-                            removeInvitedUser(event.invitedUser.id);
-                            break;
                         case "accept_workspace_invite":
                             removeInvitedUser(event.invitedUser.id);
                             addCollaborator(event.invitedUser);
                             break;
+                        case "cancel_workspace_invite":
                         case "decline_workspace_invite":
                             removeInvitedUser(event.invitedUser.id);
                             break;
                         case "leave_workspace":
-                            removeCollaborator(event.user.id);
-                            break;
                         case "delete_user":
                             removeCollaborator(event.user.id);
+                            break;
+                        case "create_release":
+                            addRelease(event.release);
+                            break;
+                        case "update_release":
+                            updateRelease(event.release);
+                            break;
+                        case "create_current_release":
+                        case "delete_release":
+                        case "move_release":
+                        case "complete_release":
+                            setReleases(event.releases);
                             break;
                         default:
                             break;

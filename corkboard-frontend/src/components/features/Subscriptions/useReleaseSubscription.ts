@@ -20,7 +20,7 @@ type ReleaseEvent =
           task: TaskType;
       };
 
-const useReleaseSubscription = (releaseId: string | null) => {
+const useReleaseSubscription = (releaseId?: string | null) => {
     const applyTaskCreated = useReleaseBoardStore((state) => state.applyTaskCreated);
     const applyTaskDestroyed = useReleaseBoardStore((state) => state.applyTaskDestroyed);
     const applyTaskUpdated = useReleaseBoardStore((state) => state.applyTaskUpdated);

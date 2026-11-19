@@ -12,7 +12,7 @@ type UserEvent =
       }
     | { type: "delete_user"; actor_id: string; workspace: WorkspaceType };
 
-const useUserSubscription = (userId: string | null) => {
+const useUserSubscription = (userId?: string | null) => {
     const { addInvitation, removeInvitation } = useMyInvitationsCache();
     const setWorkspace = useWorkspaceStore((state) => state.setWorkspace);
 

@@ -146,7 +146,7 @@ class WorkspacesController < ApplicationController
 
     @next_release.update!(current: true) if @next_release
 
-    WorkspaceBroadcaster.releases_changed(workspace.id, type: "release_created", actor_id: current_user.id)
+    WorkspaceBroadcaster.broadcast(workspace.id, "complete_release", releases: Release.state_for(workspace.id))
   end
 
   private

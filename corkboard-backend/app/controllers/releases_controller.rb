@@ -11,24 +11,27 @@ class ReleasesController < ApplicationController
 
   def create
     workspace = Workspace.find(params[:workspace_id])
-    releases_count = workspace.releases.where(completed: false).count
+    @release = Release.create!(release_params)
 
-    @release = Release.create!(release_params.merge(position: releases_count, workspace_id: workspace.id))
-    WorkspaceBroadcaster.releases_changed(workspace.id, type: "release_created", actor_id: current_user.id)
+    if @release.status == "QUEUED" || @release.current
+      WorkspaceBroadcaster.broadcast(workspace.id, "create_current_release", releases: Release.state_for(workspace.id))
+    else
+      WorkspaceBroadcaster.broadcast(workspace.id, "create_release", release: @release.as_broadcast)
+    end
 
     render :show
   end
 
   def update
     @release.update!(release_params)
-    WorkspaceBroadcaster.releases_changed(@release.workspace_id, type: "release_updated", actor_id: current_user.id)
+    WorkspaceBroadcaster.broadcast(@release.workspace_id, "update_release", release: @release.as_broadcast)
     render :show
   end
 
   def destroy
     workspace_id = @release.workspace_id
     @release.destroy!
-    WorkspaceBroadcaster.releases_changed(workspace_id, type: "release_deleted", actor_id: current_user.id)
+    WorkspaceBroadcaster.broadcast(workspace_id, "delete_release", releases: Release.state_for(workspace_id))
   end
 
   def board
@@ -47,8 +50,8 @@ class ReleasesController < ApplicationController
       release.insert_at(position)
     end
 
-    WorkspaceBroadcaster.releases_changed(workspace.id, type: "releases_moved", actor_id: current_user.id)
     @releases = workspace.releases.includes(:tasks).reorder(:position)
+    WorkspaceBroadcaster.broadcast(workspace.id, "move_release", releases: Release.state_for(workspace.id))
     render :index
   end
 

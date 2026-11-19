@@ -3,14 +3,15 @@ import useUserSubscription from "@/features/Subscriptions/useUserSubscription.ts
 import useWorkspaceSubscription from "@/features/Subscriptions/useWorkspaceSubscription.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import { useAuth } from "@/context/auth/useAuth.ts";
+import { useCurrentRelease } from "@/hooks/useReleases.ts";
 
 const Subscriptions = () => {
-    const workspaceId = useWorkspaceStore((s) => s.workspace?.id ?? null);
-    const releaseId = useWorkspaceStore((s) => s.currentRelease?.id ?? null);
-    const userId = useAuth().user?.id ?? null;
+    const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
+    const userId = useAuth().user?.id;
+    const { data: currentRelease } = useCurrentRelease(workspaceId);
 
     useWorkspaceSubscription(workspaceId);
-    useReleaseSubscription(releaseId);
+    useReleaseSubscription(currentRelease?.id);
     useUserSubscription(userId);
 
     return null;

@@ -37,15 +37,11 @@ class Release < ApplicationRecord
   NOT_QUEUED = "NOT_QUEUED"
   QUEUED = "QUEUED"
 
-  def self.next_release_id(releases)
-    list = releases.sort_by(&:position)
-    current = list.find(&:current)
-    return nil unless current
-
-    list.find { |r| r.position > current.position && r.status == "QUEUED" }&.id
+  def self.next_id_for(workspace_id)
+    next_release_id(where(workspace_id: workspace_id).select(:id, :position, :current, :status).to_a)
   end
 
-  def as_broadcast(next_id: nil)
+  def as_broadcast(next_id: self.class.next_id_for(workspace_id))
     {
       id: id,
       name: name,
@@ -55,6 +51,13 @@ class Release < ApplicationRecord
       progress: progress,
       next: next_id.present? && id == next_id
     }
+  end
+
+  def self.state_for(workspace_id)
+    releases = where(workspace_id: workspace_id).includes(:tasks).reorder(:position).to_a
+    next_id  = next_release_id(releases)
+
+    releases.map { |r| r.as_broadcast(next_id: next_id) }
   end
 
   def next_release
@@ -67,12 +70,12 @@ class Release < ApplicationRecord
              .first
   end
 
-  def set_current
-    if !self.current && self.status_changed? && self.status === Release::QUEUED
-      current_release = Release.where(workspace_id: self.workspace_id, current: true).first
+  def self.next_release_id(releases)
+    list = releases.sort_by(&:position)
+    current = list.find(&:current)
+    return nil unless current
 
-      self.current = true if current_release.nil?
-    end
+    list.find { |r| r.position > current.position && r.status == "QUEUED" }&.id
   end
 
   def progress
@@ -80,6 +83,22 @@ class Release < ApplicationRecord
       { tasks: tasks.size, accepted_tasks: tasks.count { |t| t.status == "accepted" } }
     else
       { tasks: tasks.count, accepted_tasks: tasks.where(status: "accepted").count }
+    end
+  end
+
+  private
+
+  def defaults
+    self.completed ||= false
+    self.current ||= false
+    self.status ||= NOT_QUEUED
+  end
+
+  def set_current
+    if !self.current && self.status_changed? && self.status == Release::QUEUED
+      current_release = Release.where(workspace_id: self.workspace_id, current: true).first
+
+      self.current = true if current_release.nil?
     end
   end
 
@@ -91,11 +110,5 @@ class Release < ApplicationRecord
            .order(:position)
            .first
       &.update_columns(current: true)
-  end
-
-  def defaults
-    self.completed ||= false
-    self.current ||= false
-    self.status ||= NOT_QUEUED
   end
 end

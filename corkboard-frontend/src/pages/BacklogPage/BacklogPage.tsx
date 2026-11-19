@@ -9,11 +9,11 @@ import { useShallow } from "zustand/react/shallow";
 import Loading from "@/ui/Loading/Loading.tsx";
 import workspacesApi from "@/api/workspaces.ts";
 import releasesApi from "@/api/releases.ts";
+import { useCurrentRelease } from "@/hooks/useReleases.ts";
 
 export const BacklogPage = () => {
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
-    const release = useWorkspaceStore((state) => state.currentRelease);
-    const setRelease = useWorkspaceStore((state) => state.setCurrentRelease);
+    const { data: currentRelease } = useCurrentRelease(workspaceId!);
 
     const setBacklog = useReleaseBoardStore((state) => state.setBacklog);
     const setBoard = useReleaseBoardStore((state) => state.setBoard);
@@ -27,8 +27,6 @@ export const BacklogPage = () => {
         if (!workspaceId) return;
 
         workspacesApi.getCurrentRelease(workspaceId, (response) => {
-            setRelease(response);
-
             if (response?.id) {
                 releasesApi.getBoard(response.id, (board) => {
                     setBoard(response.id, board);
@@ -40,25 +38,25 @@ export const BacklogPage = () => {
                 setLoading(false);
             });
         });
-    }, [workspaceId, setRelease, setBoard, setBacklog]);
+    }, [workspaceId, setBoard, setBacklog]);
 
     if (loading) return <Loading overlay={true} />;
 
     return (
-        <Page title="Backlog" subTitle={release?.name} className="backlog-page">
+        <Page title="Backlog" subTitle={currentRelease?.name} className="backlog-page">
             <BacklogColumn title="Backlog" icon="rows">
                 <BoardColumn columnId="backlog" key="backlog" releaseId={null} isCreateTaskOpen={isCreateTaskOpen} setIsCreateTaskOpen={setIsCreateTaskOpen} />
             </BacklogColumn>
 
             <BacklogColumn title="Tasks" icon="box">
-                {release ? (
+                {currentRelease ? (
                     columnIds
                         .filter((col) => !["backlog"].includes(col as string))
                         .map((col) => (
                             <BoardColumn
                                 columnId={col}
                                 key={col}
-                                releaseId={release.id}
+                                releaseId={currentRelease.id}
                                 isCreateTaskOpen={isCreateTaskOpen}
                                 setIsCreateTaskOpen={setIsCreateTaskOpen}
                             />

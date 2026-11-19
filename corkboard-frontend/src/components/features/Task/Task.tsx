@@ -14,6 +14,7 @@ import Tag from "@/ui/Tag/Tag.tsx";
 import { useAuth } from "@/context/auth/useAuth.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import tasksApi from "@/api/tasks.ts";
+import { useNextRelease } from "@/hooks/useReleases.ts";
 
 type TaskProps = {
     taskId: string;
@@ -35,7 +36,8 @@ export const Task = memo(({ taskId }: TaskProps) => {
     const setTaskId = useTaskStore((state) => state.setTaskId);
 
     const workspace = useWorkspaceStore((state) => state.workspace);
-    const nextRelease = useWorkspaceStore((state) => state.nextRelease);
+    const { data: nextRelease } = useNextRelease(workspace!.id);
+
     const task = useReleaseBoardStore((state) => state.tasks[taskId]);
     const updateTask = useReleaseBoardStore((state) => state.updateTask);
     const deleteTask = useReleaseBoardStore((state) => state.deleteTask);

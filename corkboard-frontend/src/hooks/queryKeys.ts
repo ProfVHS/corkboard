@@ -5,3 +5,7 @@ export const workspaceKeys = {
 export const invitationKeys = {
     mine: () => ["invitations", "mine"] as const,
 };
+
+export const releaseKeys = {
+    list: (workspaceId?: string) => ["workspaces", workspaceId, "releases"] as const,
+};

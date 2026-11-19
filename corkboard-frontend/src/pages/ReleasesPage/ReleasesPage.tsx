@@ -1,5 +1,5 @@
 import "./ReleasesPage.scss";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/ui/Button/Button.tsx";
 import type { ReleaseType } from "@/types/ReleaseType.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
@@ -11,17 +11,15 @@ import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import { EditReleaseModal } from "./EditReleaseModal.tsx";
 import releasesApi from "@/api/releases.ts";
-import useWorkspaceSubscription from "@/features/Subscriptions/useWorkspaceSubscription.ts";
-import useReleasesStore from "@/store/releasesStore.ts";
+import { useReleases, useReleasesCache } from "@/hooks/useReleases.ts";
 
 export const ReleasesPage = () => {
     const [showCreateReleaseModal, setShowCreateReleaseModal] = useState<boolean>(false);
     const [releaseToDelete, setReleaseToDelete] = useState<ReleaseType | null>(null);
     const [releaseToEdit, setReleaseToEdit] = useState<ReleaseType | null>(null);
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
-    const releases = useReleasesStore((state) => state.releases);
-    const setReleases = useReleasesStore((state) => state.setReleases);
-    const [loading, setLoading] = useState<boolean>(true);
+    const { data: releases, isLoading } = useReleases(workspaceId);
+    const { setReleases } = useReleasesCache();
 
     const handleSave = (data: { name: string }) => {
         if (!workspaceId) return;
@@ -45,18 +43,7 @@ export const ReleasesPage = () => {
         });
     };
 
-    useEffect(() => {
-        if (!workspaceId) return;
-
-        releasesApi.getAll(workspaceId, (response) => {
-            setReleases(response);
-            setLoading(false);
-        });
-    }, [workspaceId]);
-
-    useWorkspaceSubscription(workspaceId ?? null);
-
-    if (loading) return <Loading overlay={true} />;
+    if (isLoading) return <Loading overlay={true} />;
 
     return (
         <Page title="Releases" className="releases">
@@ -79,7 +66,7 @@ export const ReleasesPage = () => {
                     </Row>
                     <ReleaseList
                         columnId="NOT_QUEUED"
-                        releases={releases.filter((r) => r.status !== "QUEUED")}
+                        releases={releases!.filter((r) => r.status !== "QUEUED")}
                         onMove={setReleases}
                         onEdit={setReleaseToEdit}
                         onDelete={setReleaseToDelete}
@@ -90,7 +77,7 @@ export const ReleasesPage = () => {
                     Queue
                     <ReleaseList
                         columnId="QUEUED"
-                        releases={releases.filter((r) => r.status !== "NOT_QUEUED")}
+                        releases={releases!.filter((r) => r.status !== "NOT_QUEUED")}
                         onMove={setReleases}
                         onEdit={setReleaseToEdit}
                         onDelete={setReleaseToDelete}

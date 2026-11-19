@@ -2,7 +2,7 @@ import "./CompleteReleaseModal.scss";
 import Modal from "@/ui/Modal/Modal.tsx";
 import { Button } from "@/ui/Button/Button.tsx";
 import { useState } from "react";
-import { useWorkspaceStore } from "@/store/workspaceStore.ts";
+import { useNextRelease } from "@/hooks/useReleases.ts";
 
 export type NotAcceptedTasksAction = "accepted" | "next_release" | "backlog";
 
@@ -13,7 +13,7 @@ interface CompleteReleaseModalProps {
 
 const CompleteReleaseModal = ({ onSave, onClose }: CompleteReleaseModalProps) => {
     const [tasksAction, setTasksAction] = useState<NotAcceptedTasksAction>("accepted");
-    const nextRelease = useWorkspaceStore((state) => state.nextRelease);
+    const { data: nextRelease } = useNextRelease();
 
     const options: { value: NotAcceptedTasksAction; label: string }[] = [
         { value: "accepted", label: "Accepted" },
