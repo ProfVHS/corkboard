@@ -15,7 +15,27 @@ class WorkspacesController < ApplicationController
     @workspace = current_user.workspaces.find(params[:id])
     code_prefix_changed = @workspace.code_prefix != params[:code_prefix]
     @workspace&.update!(workspace_params)
-    @workspace.rebuild_task_codes! if code_prefix_changed
+    @workspace&.rebuild_task_codes! if code_prefix_changed
+    release_id = @workspace&.current_release&.id
+
+    if code_prefix_changed
+      if release_id
+        ReleaseBroadcaster.broadcast(
+          release_id,
+          "update_code_prefix",
+          board_tasks: Task.state_for(release_id),
+          backlog_tasks: Task.backlog_state_for(@workspace&.id)
+        )
+      else
+        WorkspaceBroadcaster.broadcast(
+          @workspace&.id,
+          "update_backlog_code_prefix",
+          tasks: Task.backlog_state_for(@workspace&.id)
+        )
+      end
+    end
+
+    WorkspaceBroadcaster.broadcast(@workspace.id, "update_workspace", workspace: @workspace)
     render "workspaces/show"
   end
 
@@ -24,7 +44,10 @@ class WorkspacesController < ApplicationController
   end
 
   def destroy
+    workspace_id = @workspace.id
     @workspace.destroy
+
+    WorkspaceBroadcaster.broadcast(workspace_id, "delete_workspace")
   end
 
   def collaborators

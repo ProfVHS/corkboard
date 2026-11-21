@@ -16,7 +16,7 @@ type ReleaseEvent =
           tasks: TaskType[];
       }
     | {
-          type: "move_between_task";
+          type: "move_between_task" | "update_code_prefix";
           actor_id: string;
           board_tasks: TaskType[];
           backlog_tasks: TaskType[];
@@ -58,6 +58,7 @@ const useReleaseSubscription = (releaseId?: string | null) => {
                             setBoardTasks(event.tasks);
                             break;
                         case "move_between_task":
+                        case "update_code_prefix":
                             setBoardTasks(event.board_tasks);
                             setBacklogTasks(event.backlog_tasks);
                             break;
