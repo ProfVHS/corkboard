@@ -29,21 +29,19 @@ class Release < ApplicationRecord
   before_save :defaults
   before_save :set_current
 
+  after_destroy :promote_next_current, if: :current
+
   default_scope { where(completed: false) }
   acts_as_list scope: [:workspace_id, :status], top_of_list: 0
 
   NOT_QUEUED = "NOT_QUEUED"
   QUEUED = "QUEUED"
 
-  def self.next_release_id(releases)
-    list = releases.sort_by(&:position)
-    current = list.find(&:current)
-    return nil unless current
-
-    list.find { |r| r.position > current.position && r.status == "QUEUED" }&.id
+  def self.next_id_for(workspace_id)
+    next_release_id(where(workspace_id: workspace_id).select(:id, :position, :current, :status).to_a)
   end
 
-  def as_broadcast(next_id: nil)
+  def as_broadcast(next_id: self.class.next_id_for(workspace_id))
     {
       id: id,
       name: name,
@@ -55,16 +53,29 @@ class Release < ApplicationRecord
     }
   end
 
-  def next_release
-    Release.find_by(workspace_id: self.workspace_id, position: self.position + 1)
+  def self.state_for(workspace_id)
+    releases = where(workspace_id: workspace_id).includes(:tasks).reorder(:position).to_a
+    next_id  = next_release_id(releases)
+
+    releases.map { |r| r.as_broadcast(next_id: next_id) }
   end
 
-  def set_current
-    if !self.current && self.status_changed? && self.status === Release::QUEUED
-      current_release = Release.where(workspace_id: self.workspace_id, current: true).first
+  def next_release
+    return unless status == QUEUED
 
-      self.current = true if current_release.nil?
-    end
+    workspace.releases
+             .where(status: QUEUED)
+             .where("releases.position > ?", position)
+             .order(:position)
+             .first
+  end
+
+  def self.next_release_id(releases)
+    list = releases.sort_by(&:position)
+    current = list.find(&:current)
+    return nil unless current
+
+    list.find { |r| r.position > current.position && r.status == "QUEUED" }&.id
   end
 
   def progress
@@ -75,24 +86,29 @@ class Release < ApplicationRecord
     end
   end
 
+  private
+
   def defaults
     self.completed ||= false
     self.current ||= false
     self.status ||= NOT_QUEUED
   end
 
-  def broadcast(type, current_user)
-    ActionCable.server.broadcast "workspace_#{self.workspace_id}", {
-      type: type,
-      actor_id: current_user.id,
-      release: {
-        id: self.id,
-        name: self.name,
-        status: self.status,
-        position: self.position,
-        current: self.current,
-        progress: self.progress
-      }
-    }
+  def set_current
+    if !self.current && self.status_changed? && self.status == Release::QUEUED
+      current_release = Release.where(workspace_id: self.workspace_id, current: true).first
+
+      self.current = true if current_release.nil?
+    end
+  end
+
+  def promote_next_current
+    return if Release.exists?(workspace_id: workspace_id, current: true)
+
+    Release.where(workspace_id: workspace_id, status: QUEUED)
+           .where.not(id: id)
+           .order(:position)
+           .first
+      &.update_columns(current: true)
   end
 end

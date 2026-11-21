@@ -22,6 +22,7 @@ import SuperAdminUser from "@/features/SuperAdmin/SuperAdminUsers/SuperAdminUser
 import TagsManager from "@/features/Settings/TagsManager/TagsManager.tsx";
 import GuestRoute from "@/features/GuestRoute.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Subscriptions from "@/features/Subscriptions/Subscriptions.ts";
 
 const queryClient = new QueryClient();
 
@@ -29,24 +30,25 @@ createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
+                <Subscriptions />
                 <BrowserRouter>
                     <Routes>
                         <Route
-                        path="/"
-                        element={
-                            <GuestRoute>
-                                <LoginPage />
-                            </GuestRoute>
-                        }
-                    />
+                            path="/"
+                            element={
+                                <GuestRoute>
+                                    <LoginPage />
+                                </GuestRoute>
+                            }
+                        />
                         <Route
-                        path="/signup"
-                        element={
-                            <GuestRoute>
-                                <SignUpPage />
-                            </GuestRoute>
-                        }
-                    />
+                            path="/signup"
+                            element={
+                                <GuestRoute>
+                                    <SignUpPage />
+                                </GuestRoute>
+                            }
+                        />
                         <Route
                             path="/workspaces/:workspaceId/current_release"
                             element={

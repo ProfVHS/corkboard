@@ -13,8 +13,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [token, setToken] = useState<string | null>(null);
     const setWorkspace = useWorkspaceStore((state) => state.setWorkspace);
-    const setCurrentRelease = useWorkspaceStore((state) => state.setCurrentRelease);
-    const setNextRelease = useWorkspaceStore((state) => state.setNextRelease);
 
     useEffect(() => {
         const localStorageToken = localStorage.getItem("token");
@@ -22,8 +20,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             usersApi.me(
                 (response) => {
                     setWorkspace(response.workspace);
-                    setCurrentRelease(response.release);
-                    setNextRelease(response.next_release);
                     setToken(localStorageToken);
                     setUser(response.user);
                     setLoading(false);
@@ -34,7 +30,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 },
             );
         }
-    }, [setCurrentRelease, setNextRelease, setWorkspace, token]);
+    }, [setWorkspace, token]);
 
     return <AuthContext.Provider value={{ user, setUser, loading, setLoading, token, setToken }}>{children}</AuthContext.Provider>;
 };

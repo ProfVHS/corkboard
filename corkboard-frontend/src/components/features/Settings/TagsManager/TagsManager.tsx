@@ -1,6 +1,6 @@
 import "./TagsManager.scss";
 import { Table } from "@/ui/Table/Table.tsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { TagType } from "@/types/TagType.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import { Button } from "@/ui/Button/Button.tsx";
@@ -9,33 +9,25 @@ import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 import CreateTagModal from "@/ui/Popovers/TagsPopover/CreateTagModal.tsx";
 import Loading from "@/ui/Loading/Loading.tsx";
 import tagsApi from "@/api/tags.ts";
+import { useTags } from "@/query/useTags.ts";
 
 const TagsManager = () => {
-    const [tags, setTags] = useState<TagType[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
     const [tagToDelete, setTagToDelete] = useState<TagType | null>(null);
     const [tagToEdit, setTagToEdit] = useState<TagType | null>(null);
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
+    const { data: tags = [], isLoading } = useTags(workspaceId);
 
     const handleDeleteTag = () => {
         if (!tagToDelete) return;
 
         tagsApi.delete(tagToDelete.id, () => {
-            setTags((prev) => prev.filter((t) => t.id !== tagToDelete.id));
             setTagToDelete(null);
         });
     };
 
-    useEffect(() => {
-        if (!workspaceId) return;
+    console.log(tags);
 
-        tagsApi.getAll({ workspace_id: workspaceId }, (response) => {
-            setTags(response.tags);
-            setLoading(false);
-        });
-    }, [workspaceId]);
-
-    if (loading) {
+    if (isLoading) {
         return <Loading />;
     }
 
@@ -83,21 +75,7 @@ const TagsManager = () => {
                 />
             )}
 
-            {tagToEdit && (
-                <CreateTagModal
-                    tag={tagToEdit}
-                    onSave={(data) => {
-                        if (tagToEdit?.id) {
-                            setTags((prev) => prev.map((tag) => (tag.id === tagToEdit.id ? data : tag)));
-                        } else {
-                            tags.push(data);
-                        }
-
-                        setTagToEdit(null);
-                    }}
-                    onClose={() => setTagToEdit(null)}
-                />
-            )}
+            {tagToEdit && <CreateTagModal tag={tagToEdit} onSave={() => setTagToEdit(null)} onClose={() => setTagToEdit(null)} />}
         </div>
     );
 };

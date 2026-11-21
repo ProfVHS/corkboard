@@ -1,7 +1,6 @@
 import "./Task.scss";
 import { Button } from "@/ui/Button/Button.tsx";
 import { EditableText } from "@/ui/EditableText/EditableText.tsx";
-import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ClassNames } from "@/global/utils.ts";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -10,20 +9,25 @@ import { ContextMenu, type ContextMenuItem } from "@/ui/ContextMenu/ContextMenu.
 import { useTaskStore } from "@/store/taskStore.ts";
 import { Icon } from "@/ui/Icons/Icon.tsx";
 import UserPopover from "@/ui/Popovers/UserPopover/UserPopover.tsx";
-import Tag from "@/ui/Tag/Tag.tsx";
 import { useAuth } from "@/context/auth/useAuth.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import tasksApi from "@/api/tasks.ts";
+import { useCurrentRelease, useNextRelease } from "@/query/useReleases.ts";
+import type { TaskType } from "@/types/ReleaseBoardTypes.ts";
+import { useTasksCache } from "@/query/useTasks.ts";
+import { useTaskTags } from "@/query/useTags.ts";
+import Tag from "@/ui/Tag/Tag.tsx";
 
 type TaskProps = {
-    taskId: string;
+    task: TaskType;
 };
 
 type Inputs = {
     name: string;
 };
 
-export const Task = memo(({ taskId }: TaskProps) => {
+export const Task = memo(({ task }: TaskProps) => {
+    const taskId = task.id;
     const [isEditing, setIsEditing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -35,13 +39,10 @@ export const Task = memo(({ taskId }: TaskProps) => {
     const setTaskId = useTaskStore((state) => state.setTaskId);
 
     const workspace = useWorkspaceStore((state) => state.workspace);
-    const nextRelease = useWorkspaceStore((state) => state.nextRelease);
-    const task = useReleaseBoardStore((state) => state.tasks[taskId]);
-    const updateTask = useReleaseBoardStore((state) => state.updateTask);
-    const deleteTask = useReleaseBoardStore((state) => state.deleteTask);
-    const moveToNextRelease = useReleaseBoardStore((state) => state.moveToNextRelease);
-    const moveToBacklog = useReleaseBoardStore((state) => state.moveToBacklog);
-    const moveTaskBetweenColumns = useReleaseBoardStore((state) => state.moveTaskBetweenColumns);
+    const { data: currentRelease } = useCurrentRelease(workspace?.id);
+    const { data: nextRelease } = useNextRelease(workspace?.id);
+    const { data: tags = [] } = useTaskTags(task.tags);
+    const { updateTask } = useTasksCache();
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         tasksApi.update(taskId, { name: data.name }, (response) => {
@@ -55,11 +56,11 @@ export const Task = memo(({ taskId }: TaskProps) => {
 
         return draggable({
             element: ref.current,
-            getInitialData: () => ({ type: "task", taskId }),
+            getInitialData: () => ({ type: "task", taskId, status: task.status }),
             onDragStart: () => setIsDragging(true),
             onDrop: () => setIsDragging(false),
         });
-    }, [taskId]);
+    }, [taskId, task.status]);
 
     useEffect(() => {
         if (isDragging) {
@@ -80,57 +81,37 @@ export const Task = memo(({ taskId }: TaskProps) => {
     const contextMenuOptions = useCallback(
         (): ContextMenuItem[] =>
             [
-                {
-                    type: "button",
-                    label: "Rename",
-                    icon: "edit",
-                    onClick: () => setIsEditing(true),
-                },
-                {
-                    type: "hr",
-                },
-                task.status === "backlog" && {
-                    type: "button",
-                    label: "Move To Current Release",
-                    icon: "boxArrowUp",
-                    onClick: () => moveTaskBetweenColumns(taskId, "backlog", "todo"),
-                },
+                { type: "button", label: "Rename", icon: "edit", onClick: () => setIsEditing(true) },
+                { type: "hr" },
+                task.status === "backlog" &&
+                    currentRelease && {
+                        type: "button",
+                        label: "Move To Current Release",
+                        icon: "boxArrowUp",
+                        onClick: () => tasksApi.move(taskId, { status: "todo", release_id: currentRelease.id }, () => {}),
+                    },
                 nextRelease && {
                     type: "button",
                     label: "Move To Next Release",
                     icon: "boxArrowUp",
-                    onClick: () => {
-                        tasksApi.moveToNextRelease(taskId, () => {
-                            moveToNextRelease(taskId);
-                        });
-                    },
+                    onClick: () => tasksApi.moveToNextRelease(taskId, () => {}),
                 },
                 task.status !== "backlog" && {
                     type: "button",
                     label: "Move To Backlog",
                     icon: "boxArrowDown",
-                    onClick: () => {
-                        tasksApi.update(taskId, { status: "backlog", release_id: null }, () => {
-                            moveToBacklog(taskId);
-                        });
-                    },
+                    onClick: () => tasksApi.move(taskId, { status: "backlog", release_id: null }, () => {}),
                 },
-                {
-                    type: "hr",
-                },
+                { type: "hr" },
                 {
                     type: "button",
                     label: "Delete",
                     color: "red",
                     icon: "trash",
-                    onClick: () => {
-                        tasksApi.delete(taskId, () => {
-                            deleteTask(taskId);
-                        });
-                    },
+                    onClick: () => tasksApi.delete(taskId, () => {}),
                 },
             ].filter(Boolean) as ContextMenuItem[],
-        [deleteTask, moveTaskBetweenColumns, moveToBacklog, moveToNextRelease, nextRelease, task.status, taskId],
+        [currentRelease, nextRelease, task.status, taskId],
     );
 
     return (
@@ -162,12 +143,12 @@ export const Task = memo(({ taskId }: TaskProps) => {
 
                     {user?.preferences.show_board_tags && (
                         <>
-                            {task.tags.slice(0, 3).map((tag) => (
-                                <Tag tag={tag} />
+                            {tags.slice(0, 3).map((tag) => (
+                                <Tag key={tag.id} tag={tag} />
                             ))}
-                            {task.tags.length > 3 && (
+                            {tags.length > 3 && (
                                 <div className="tag">
-                                    <span>+{task.tags.length - 3}</span>
+                                    <span>+{tags.length - 3}</span>
                                 </div>
                             )}
                         </>

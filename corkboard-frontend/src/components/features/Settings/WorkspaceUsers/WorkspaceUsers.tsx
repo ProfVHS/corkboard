@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/useToast.ts";
 import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 import workspacesApi from "@/api/workspaces.ts";
-import { useCollaborators, useCollaboratorsCache, useInvitedUsers } from "@/hooks/useCollaborators.ts";
+import { useCollaborators, useCollaboratorsCache, useInvitedUsers } from "@/query/useCollaborators.ts";
 
 const WorkspaceUsers = () => {
     const [showInviteModal, setShowInviteModal] = useState(false);
@@ -85,12 +85,12 @@ const WorkspaceUsers = () => {
                             header: "Options",
                             render: (_, row) => (
                                 <>
-                                    {workspace?.owner.id === user?.id && user?.id !== row.id && (
+                                    {workspace?.owner?.id === user?.id && user?.id !== row.id && (
                                         <>
                                             <Button icon="trash" variant="icon" size="small" color="outlined" onClick={() => setUserToDelete(row)} />
                                         </>
                                     )}
-                                    {workspace?.owner.id !== user?.id && user?.id === row.id && (
+                                    {workspace?.owner?.id !== user?.id && user?.id === row.id && (
                                         <>
                                             <Button icon="doorOpen" variant="icon" size="small" color="outlined" onClick={() => setUserToLeave(row)} />
                                         </>

@@ -3,32 +3,20 @@ import { useToast } from "@/hooks/useToast.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import type { WorkspaceType } from "@/types/WorkspaceType.ts";
 import workspacesApi from "@/api/workspaces.ts";
-
-type InvitationType = {
-    invited_by: string;
-    workspace: {
-        id: string;
-        name: string;
-    };
-};
+import { useMyInvitationsCache } from "@/query/useMyInvitations.ts";
 
 interface UseUserNotificationProps {
+    workspaceId: string;
     updateWorkspaces: (workspace: WorkspaceType) => void;
 }
 
 const useUserNotification = ({ updateWorkspaces }: UseUserNotificationProps) => {
     const [showNotifications, setShowNotifications] = useState(false);
-    const [invitations, setInvitations] = useState<InvitationType[]>([]);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const toast = useToast();
     const setWorkspace = useWorkspaceStore((state) => state.setWorkspace);
-
-    useEffect(() => {
-        workspacesApi.getInvitation((response) => {
-            setInvitations(response);
-        });
-    }, []);
+    const { removeInvitation } = useMyInvitationsCache();
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -50,7 +38,7 @@ const useUserNotification = ({ updateWorkspaces }: UseUserNotificationProps) => 
 
     const acceptInvitation = (workspaceId: string) => {
         workspacesApi.acceptInvitation(workspaceId, (response) => {
-            setInvitations((prev) => prev.filter((i) => i.workspace.id !== workspaceId));
+            removeInvitation(workspaceId);
             toast.success(response.message);
             updateWorkspaces(response.workspace);
             setWorkspace(response.workspace);
@@ -59,12 +47,12 @@ const useUserNotification = ({ updateWorkspaces }: UseUserNotificationProps) => 
 
     const declineInvitation = (workspaceId: string, invitationName: string) => {
         workspacesApi.declineInvitation(workspaceId, { name: invitationName }, (response) => {
-            setInvitations((prev) => prev.filter((i) => i.workspace.id !== workspaceId));
-            toast.success(response.data.message);
+            removeInvitation(workspaceId);
+            toast.success(response.message);
         });
     };
 
-    return { showNotifications, setShowNotifications, invitations, triggerRef, menuRef, acceptInvitation, declineInvitation };
+    return { showNotifications, setShowNotifications, triggerRef, menuRef, acceptInvitation, declineInvitation };
 };
 
 export default useUserNotification;

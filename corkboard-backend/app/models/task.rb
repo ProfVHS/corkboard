@@ -71,24 +71,30 @@ class Task < ApplicationRecord
     end
   end
 
-  def broadcast_to_release(type, current_user)
-    ActionCable.server.broadcast "release_#{self.release_id}", {
-      type: type,
-      actor_id: current_user.id,
-      task: {
-        id: self.id,
-        name: self.name,
-        status: self.status,
-        position: self.position,
-        release_id: self.release_id,
-        workspace_id: self.workspace_id,
-        tags: [],
-        user: self.user ? {
-          id: self.user.id,
-          username: self.user.username,
-        } : nil
-      }
+  def as_broadcast
+    {
+      id: id,
+      name: name,
+      code_name: code_name,
+      status: status,
+      priority: priority,
+      position: position,
+      start_date: start_date,
+      due_date: due_date,
+      release_id: release_id,
+      workspace_id: workspace_id,
+      tags: tag_ids,
+      user: user && { id: user.id, username: user.username }
     }
+  end
+
+  def self.state_for(release_id)
+    where(release_id: release_id).includes(:user, :tags).reorder(:position).map(&:as_broadcast)
+  end
+
+  def self.backlog_state_for(workspace_id)
+    where(workspace_id: workspace_id, release_id: nil, status: "backlog")
+      .includes(:user, :tags).reorder(:position).map(&:as_broadcast)
   end
 
   private

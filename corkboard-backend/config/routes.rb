@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   resources :tasks do
     member do
       put :move_to_next_release
+      put :move
     end
     resources :tags, only: [] do
       member do
@@ -45,7 +46,7 @@ Rails.application.routes.draw do
 
   resources :workspaces do
     member do
-      get :backlog
+      get :backlog, controller: "tasks", action: :backlog
       get :collaborators
       get :current_release
       post :invite_user

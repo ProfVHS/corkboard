@@ -1,5 +1,5 @@
 import "./ReleasesPage.scss";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/ui/Button/Button.tsx";
 import type { ReleaseType } from "@/types/ReleaseType.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
@@ -11,45 +11,20 @@ import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 import CreateModal from "@/ui/Modals/CreateModal.tsx";
 import { EditReleaseModal } from "./EditReleaseModal.tsx";
 import releasesApi from "@/api/releases.ts";
-import { cable } from "@/lib/cable.ts";
-import { useAuth } from "@/context/auth/useAuth.ts";
-
-type ReleaseEvent =
-    | {
-          type: "release_created";
-          actor_id: string;
-          release: ReleaseType;
-      }
-    | {
-          type: "release_updated";
-          actor_id: string;
-          release: ReleaseType;
-      }
-    | {
-          type: "release_deleted";
-          actor_id: string;
-          release: ReleaseType;
-      }
-    | {
-          type: "release_moved";
-          actor_id: string;
-          releases: ReleaseType[];
-      };
+import { useReleases, useReleasesCache } from "@/query/useReleases.ts";
 
 export const ReleasesPage = () => {
     const [showCreateReleaseModal, setShowCreateReleaseModal] = useState<boolean>(false);
     const [releaseToDelete, setReleaseToDelete] = useState<ReleaseType | null>(null);
     const [releaseToEdit, setReleaseToEdit] = useState<ReleaseType | null>(null);
-    const [releases, setReleases] = useState<ReleaseType[]>([]);
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
-    const [loading, setLoading] = useState<boolean>(true);
-    const { user } = useAuth();
+    const { data: releases, isLoading } = useReleases(workspaceId);
+    const { setReleases } = useReleasesCache();
 
     const handleSave = (data: { name: string }) => {
         if (!workspaceId) return;
 
-        releasesApi.create({ name: data.name, workspace_id: workspaceId, status: "NOT_QUEUED" }, (response) => {
-            setReleases((prev) => [...prev, response]);
+        releasesApi.create({ name: data.name, workspace_id: workspaceId, status: "NOT_QUEUED" }, () => {
             setShowCreateReleaseModal(false);
         });
     };
@@ -58,71 +33,17 @@ export const ReleasesPage = () => {
         if (!releaseToDelete) return;
 
         releasesApi.delete(releaseToDelete.id, () => {
-            setReleases((prev) => prev.filter((r) => r.id !== releaseToDelete.id));
             setReleaseToDelete(null);
         });
     };
 
     const handleEdit = (releaseId: string, name: string) => {
-        releasesApi.update(releaseId, { name }, (response) => {
-            setReleases((prev) => prev.map((r) => (r.id === response.id ? response : r)));
+        releasesApi.update(releaseId, { name }, () => {
             setReleaseToEdit(null);
         });
     };
 
-    useEffect(() => {
-        if (!workspaceId) return;
-
-        releasesApi.getAll(workspaceId, (response) => {
-            setReleases(response);
-            setLoading(false);
-        });
-    }, [workspaceId]);
-
-    useEffect(() => {
-        if (!user) return;
-
-        const subscription = cable.subscriptions.create(
-            {
-                channel: "WorkspaceChannel",
-                workspace_id: workspaceId,
-            },
-            {
-                connected() {
-                    console.log("Connected to Workspace");
-                },
-                disconnected: () => {
-                    console.log("Disconnected from Workspace");
-                },
-                received: (event: ReleaseEvent) => {
-                    if (event.actor_id !== user.id) {
-                        switch (event.type) {
-                            case "release_created":
-                                setReleases((prev) => [...prev, event.release]);
-                                break;
-                            case "release_updated":
-                                setReleases((prev) => prev.map((r) => (r.id === event.release.id ? event.release : r)));
-                                break;
-                            case "release_deleted":
-                                setReleases((prev) => prev.filter((r) => r.id !== event.release.id));
-                                break;
-                            case "release_moved":
-                                setReleases(event.releases);
-                                break;
-                            default:
-                                console.error(event);
-                        }
-                    }
-                },
-            },
-        );
-
-        return () => {
-            subscription.unsubscribe();
-        };
-    }, [releases, user, workspaceId]);
-
-    if (loading) return <Loading overlay={true} />;
+    if (isLoading) return <Loading overlay={true} />;
 
     return (
         <Page title="Releases" className="releases">
@@ -145,7 +66,7 @@ export const ReleasesPage = () => {
                     </Row>
                     <ReleaseList
                         columnId="NOT_QUEUED"
-                        releases={releases.filter((r) => r.status !== "QUEUED")}
+                        releases={releases!.filter((r) => r.status !== "QUEUED")}
                         onMove={setReleases}
                         onEdit={setReleaseToEdit}
                         onDelete={setReleaseToDelete}
@@ -156,7 +77,7 @@ export const ReleasesPage = () => {
                     Queue
                     <ReleaseList
                         columnId="QUEUED"
-                        releases={releases.filter((r) => r.status !== "NOT_QUEUED")}
+                        releases={releases!.filter((r) => r.status !== "NOT_QUEUED")}
                         onMove={setReleases}
                         onEdit={setReleaseToEdit}
                         onDelete={setReleaseToDelete}
