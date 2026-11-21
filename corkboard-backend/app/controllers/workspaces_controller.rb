@@ -34,10 +34,6 @@ class WorkspacesController < ApplicationController
     @invited_users = User.where(id: invited_user_ids)
   end
 
-  def backlog
-    @tasks = Task.where(workspace_id: @workspace.id, status: Task.statuses[:backlog], release_id: nil)
-  end
-
   def invitation
     @invitation = WorkspaceInvitation.where(invited_user_id: current_user.id)
   end

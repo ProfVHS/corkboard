@@ -33,6 +33,11 @@ const tasksApi = {
             .then((response) => onSuccess(response.data))
             .catch(onError);
     },
+    move: (taskId: string, data: Partial<TaskType>, onSuccess: (response: any) => void, onError?: (error: unknown) => void) => {
+        api.put(`/tasks/${taskId}/move`, data)
+            .then((response) => onSuccess(response.data))
+            .catch(onError);
+    },
     moveToNextRelease: (taskId: string, onSuccess: () => void, onError?: (error: unknown) => void) => {
         api.put(`/tasks/${taskId}/move_to_next_release`).then(onSuccess).catch(onError);
     },

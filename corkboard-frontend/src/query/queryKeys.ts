@@ -9,3 +9,8 @@ export const invitationKeys = {
 export const releaseKeys = {
     list: (workspaceId?: string) => ["workspaces", workspaceId, "releases"] as const,
 };
+
+export const taskKeys = {
+    board: (releaseId?: string) => ["releases", releaseId, "tasks"] as const,
+    backlog: (workspaceId?: string) => ["workspaces", workspaceId, "backlog"] as const,
+};

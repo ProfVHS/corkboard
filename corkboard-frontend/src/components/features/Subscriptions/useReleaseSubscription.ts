@@ -1,18 +1,31 @@
 import type { TaskType } from "@/types/ReleaseBoardTypes.ts";
 import { useEffect } from "react";
 import { cable } from "@/lib/cable.ts";
-import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
+import { useBacklogCache, useTasksCache } from "@/query/useTasks.ts";
+import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 
-type ReleaseEvent = {
-    type: "create_task" | "update_task" | "delete_task" | "move_to_next_task";
-    actor_id: string;
-    task: TaskType;
-};
+type ReleaseEvent =
+    | {
+          type: "create_task" | "update_task";
+          actor_id: string;
+          task: TaskType;
+      }
+    | {
+          type: "delete_task" | "move_to_next_task" | "move_board_task";
+          actor_id: string;
+          tasks: TaskType[];
+      }
+    | {
+          type: "move_between_task";
+          actor_id: string;
+          board_tasks: TaskType[];
+          backlog_tasks: TaskType[];
+      };
 
 const useReleaseSubscription = (releaseId?: string | null) => {
-    const applyTaskCreated = useReleaseBoardStore((state) => state.applyTaskCreated);
-    const applyTaskDestroyed = useReleaseBoardStore((state) => state.applyTaskDestroyed);
-    const applyTaskUpdated = useReleaseBoardStore((state) => state.applyTaskUpdated);
+    const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
+    const { addTask, updateTask, setTasks: setBoardTasks } = useTasksCache(releaseId!);
+    const { setTasks: setBacklogTasks } = useBacklogCache(workspaceId!);
 
     useEffect(() => {
         if (!releaseId) return;
@@ -30,16 +43,22 @@ const useReleaseSubscription = (releaseId?: string | null) => {
                     console.log("Disconnected from Release", releaseId);
                 },
                 received: (event: ReleaseEvent) => {
+                    console.log(event);
                     switch (event.type) {
                         case "create_task":
-                            applyTaskCreated(event.task);
+                            addTask(event.task);
                             break;
                         case "update_task":
-                            applyTaskUpdated(event.task);
+                            updateTask(event.task.id, event.task);
                             break;
                         case "delete_task":
                         case "move_to_next_task":
-                            applyTaskDestroyed(event.task.id);
+                        case "move_board_task":
+                            setBoardTasks(event.tasks);
+                            break;
+                        case "move_between_task":
+                            setBoardTasks(event.board_tasks);
+                            setBacklogTasks(event.backlog_tasks);
                             break;
                         default:
                             console.error(event);

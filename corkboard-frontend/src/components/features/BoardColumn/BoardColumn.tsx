@@ -4,22 +4,22 @@ import { Button } from "@/components/ui/Button/Button.tsx";
 import * as _ from "lodash";
 import { type Dispatch, Fragment, memo, type SetStateAction, useEffect, useRef, useState } from "react";
 import { TaskForm } from "../TaskForm/TaskForm.tsx";
-import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
 import { Task } from "../Task/Task.tsx";
-import { useShallow } from "zustand/react/shallow";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import tasksApi from "@/api/tasks.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
-import type { TaskStatus } from "@/types/ReleaseBoardTypes.ts";
+import type { TaskStatus, TaskType } from "@/types/ReleaseBoardTypes.ts";
+import { useTasksCache } from "@/query/useTasks.ts";
 
 type BoardColumnProps = {
     columnId: TaskStatus;
     releaseId: string | null;
+    tasks: TaskType[];
     isCreateTaskOpen: boolean;
     setIsCreateTaskOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export const BoardColumn = memo(({ columnId, releaseId, isCreateTaskOpen, setIsCreateTaskOpen }: BoardColumnProps) => {
+export const BoardColumn = memo(({ columnId, releaseId, tasks, isCreateTaskOpen, setIsCreateTaskOpen }: BoardColumnProps) => {
     const [showCreateTask, setShowCreateTask] = useState(false);
     const newTaskRef = useRef<HTMLDivElement>(null);
     const ref = useRef<HTMLDivElement>(null);
@@ -27,16 +27,15 @@ export const BoardColumn = memo(({ columnId, releaseId, isCreateTaskOpen, setIsC
     const [isDragOver, setIsDragOver] = useState(false);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
-    const taskIds = useReleaseBoardStore(useShallow((state) => state.columns.find((col) => col.id === columnId)?.taskIds ?? []));
-    const addTask = useReleaseBoardStore((state) => state.addTask);
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
+    const { addTask, refetch } = useTasksCache();
 
     const handleTaskAdd = (name: string) => {
         const trimmedName = name.trim();
 
-        if (trimmedName || workspaceId) {
+        if (trimmedName && workspaceId) {
             tasksApi.create({ name: trimmedName, workspace_id: workspaceId, release_id: releaseId, status: columnId as TaskStatus }, (response) => {
-                addTask(columnId, response);
+                addTask(response);
             });
         }
 
@@ -51,6 +50,15 @@ export const BoardColumn = memo(({ columnId, releaseId, isCreateTaskOpen, setIsC
         setShowCreateTask(true);
     };
 
+    const getDropIndex = (y: number) => {
+        let index = tasks.length;
+        ref.current?.querySelectorAll(".task:not(.dragging)").forEach((element, i) => {
+            const rect = element.getBoundingClientRect();
+            if (y < rect.top + rect.height / 2 && index === tasks.length) index = i;
+        });
+        return index;
+    };
+
     useEffect(() => {
         if (!ref.current) return;
 
@@ -62,60 +70,24 @@ export const BoardColumn = memo(({ columnId, releaseId, isCreateTaskOpen, setIsC
                 setIsDragOver(false);
                 setDragOverIndex(null);
             },
-            onDrag: ({ location }) => {
-                const taskElements = ref.current?.querySelectorAll(".task:not(.dragging)");
-                if (!taskElements) return;
-
-                const y = location.current.input.clientY;
-                let index = taskIds.length;
-
-                taskElements.forEach((element, i) => {
-                    const rect = element.getBoundingClientRect();
-                    const middle = rect.top + rect.height / 2;
-                    if (y < middle && index === taskIds.length) {
-                        index = i;
-                    }
-                });
-
-                setDragOverIndex(index);
-            },
+            onDrag: ({ location }) => setDragOverIndex(getDropIndex(location.current.input.clientY)),
             onDrop: ({ source, location }) => {
                 setIsDragOver(false);
                 setDragOverIndex(null);
 
                 const taskId = source.data.taskId as string;
+                const fromStatus = source.data.status as string;
                 if (!taskId) return;
 
-                const { columns, moveTaskBetweenColumns, reorderTaskInColumn } = useReleaseBoardStore.getState();
-                const fromColumn = columns.find((col) => col.taskIds.includes(taskId));
-                if (!fromColumn) return;
-
-                const taskElements = ref.current?.querySelectorAll(".task:not(.dragging)");
-
-                const y = location.current.input.clientY;
-                let index = taskIds.length;
-
-                taskElements?.forEach((element, i) => {
-                    const rect = element.getBoundingClientRect();
-                    const middle = rect.top + rect.height / 2;
-                    if (y < middle && index === taskIds.length) {
-                        index = i;
-                    }
-                });
-
-                const diffColumn = fromColumn.id !== columnId;
+                const index = getDropIndex(location.current.input.clientY);
+                const diffColumn = fromStatus !== columnId;
                 const payload = diffColumn ? { status: columnId, position: index, release_id: releaseId } : { position: index };
 
-                tasksApi.update(taskId, payload, () => {
-                    if (diffColumn) {
-                        moveTaskBetweenColumns(taskId, fromColumn.id, columnId, index);
-                    } else {
-                        reorderTaskInColumn(columnId, taskId, index);
-                    }
-                });
+                tasksApi.move(taskId, payload, () => {});
             },
         });
-    }, [columnId, releaseId, taskIds]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [columnId, releaseId, tasks, refetch]);
 
     useEffect(() => {
         if (!isCreateTaskOpen) return;
@@ -147,13 +119,13 @@ export const BoardColumn = memo(({ columnId, releaseId, isCreateTaskOpen, setIsC
                 {_.upperCase(columnId as string)}
             </div>
             <div ref={tasksContainerRef} className="board-column__tasks">
-                {taskIds.map((taskId, index) => (
-                    <Fragment key={taskId}>
+                {tasks.map((task, index) => (
+                    <Fragment key={task.id}>
                         {dragOverIndex === index && <div className="board-column__placeholder" />}
-                        <Task taskId={taskId} />
+                        <Task task={task} />
                     </Fragment>
                 ))}
-                {dragOverIndex === taskIds.length && <div className="board-column__placeholder" />}
+                {dragOverIndex === tasks.length && <div className="board-column__placeholder" />}
                 {showCreateTask && <TaskForm onSave={handleTaskAdd} ref={newTaskRef} />}
             </div>
             <div className="board-column__footer">

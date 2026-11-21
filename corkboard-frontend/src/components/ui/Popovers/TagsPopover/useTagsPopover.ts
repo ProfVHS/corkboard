@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { TagType } from "@/types/TagType.ts";
 import tagsApi from "@/api/tags.ts";
-import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
 
 interface useTagsPopoverProps {
     taskId: string;
@@ -11,12 +10,9 @@ const useTagsPopover = ({ taskId }: useTagsPopoverProps) => {
     const [showCreateTagModal, setShowCreateTagModal] = useState<boolean>(false);
     const [tags, setTags] = useState<TagType[]>([]);
     const [taskTags, setTaskTags] = useState<TagType[]>([]);
-    const addTagToTask = useReleaseBoardStore((state) => state.addTagToTask);
-    const removeTagFromTask = useReleaseBoardStore((state) => state.removeTagFromTask);
 
     const handleAddTagToTask = (tagId: string) => {
         tagsApi.assign(taskId, tagId, (response) => {
-            addTagToTask(taskId, response);
             setTags((prev) => prev.filter((t) => t.id !== response.id));
             taskTags.push(response);
         });
@@ -24,7 +20,6 @@ const useTagsPopover = ({ taskId }: useTagsPopoverProps) => {
 
     const handleRemoveTagFromTask = (tagId: string) => {
         tagsApi.unassign(taskId, tagId, (response) => {
-            removeTagFromTask(taskId, tagId);
             setTaskTags((prev) => prev.filter((t) => t.id !== response.id));
             tags.push(response);
         });

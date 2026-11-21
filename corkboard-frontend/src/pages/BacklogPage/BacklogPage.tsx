@@ -1,66 +1,48 @@
 import "./BacklogPage.scss";
 import { Page } from "@/layout/Page/Page.tsx";
 import { BacklogColumn } from "@/pages/BacklogPage/BacklogColumn/BacklogColumn.tsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
-import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
 import { BoardColumn } from "@/features/BoardColumn/BoardColumn.tsx";
-import { useShallow } from "zustand/react/shallow";
 import Loading from "@/ui/Loading/Loading.tsx";
-import workspacesApi from "@/api/workspaces.ts";
-import releasesApi from "@/api/releases.ts";
 import { useCurrentRelease } from "@/query/useReleases.ts";
+import { useBacklogTasks, useBoardColumns } from "@/query/useTasks.ts";
 
 export const BacklogPage = () => {
     const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
-    const { data: currentRelease } = useCurrentRelease(workspaceId!);
+    const { data: currentRelease, isLoading: isLoadingRelease } = useCurrentRelease(workspaceId);
+    const { data: columns = [], isLoading: isLoadingTasks } = useBoardColumns(currentRelease?.id);
+    const { data: backlogTasks = [], isLoading: isLoadingBacklog } = useBacklogTasks(workspaceId);
+    const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
-    const setBacklog = useReleaseBoardStore((state) => state.setBacklog);
-    const setBoard = useReleaseBoardStore((state) => state.setBoard);
+    if (isLoadingRelease || isLoadingTasks || isLoadingBacklog) return <Loading overlay={true} />;
 
-    const columnIds = useReleaseBoardStore(useShallow((state) => state.columns.map((col) => col.id)));
-    const [isCreateTaskOpen, setIsCreateTaskOpen] = useState<boolean>(false);
-
-    const [loading, setLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        if (!workspaceId) return;
-
-        workspacesApi.getCurrentRelease(workspaceId, (response) => {
-            if (response?.id) {
-                releasesApi.getBoard(response.id, (board) => {
-                    setBoard(response.id, board);
-                });
-            }
-
-            workspacesApi.getBacklog(workspaceId, (response) => {
-                setBacklog(response);
-                setLoading(false);
-            });
-        });
-    }, [workspaceId, setBoard, setBacklog]);
-
-    if (loading) return <Loading overlay={true} />;
+    console.log(columns);
 
     return (
         <Page title="Backlog" subTitle={currentRelease?.name} className="backlog-page">
             <BacklogColumn title="Backlog" icon="rows">
-                <BoardColumn columnId="backlog" key="backlog" releaseId={null} isCreateTaskOpen={isCreateTaskOpen} setIsCreateTaskOpen={setIsCreateTaskOpen} />
+                <BoardColumn
+                    columnId="backlog"
+                    releaseId={null}
+                    tasks={backlogTasks}
+                    isCreateTaskOpen={isCreateTaskOpen}
+                    setIsCreateTaskOpen={setIsCreateTaskOpen}
+                />
             </BacklogColumn>
 
             <BacklogColumn title="Tasks" icon="box">
                 {currentRelease ? (
-                    columnIds
-                        .filter((col) => !["backlog"].includes(col as string))
-                        .map((col) => (
-                            <BoardColumn
-                                columnId={col}
-                                key={col}
-                                releaseId={currentRelease.id}
-                                isCreateTaskOpen={isCreateTaskOpen}
-                                setIsCreateTaskOpen={setIsCreateTaskOpen}
-                            />
-                        ))
+                    columns.map((col) => (
+                        <BoardColumn
+                            key={col.id}
+                            columnId={col.id}
+                            tasks={col.tasks}
+                            releaseId={currentRelease.id}
+                            isCreateTaskOpen={isCreateTaskOpen}
+                            setIsCreateTaskOpen={setIsCreateTaskOpen}
+                        />
+                    ))
                 ) : (
                     <div className="releases-empty-message">You don't have any active releases yet.</div>
                 )}

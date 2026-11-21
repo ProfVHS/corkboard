@@ -5,10 +5,9 @@ import Popover from "@/ui/Popover/Popover.tsx";
 import { Icon } from "@/ui/Icons/Icon.tsx";
 import { Input } from "@/ui/Input/Input.tsx";
 import { DayPicker, type DateRange } from "react-day-picker";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { format, isSameYear, isSameDay, parse, isValid, startOfDay, differenceInCalendarDays } from "date-fns";
 import tasksApi from "@/api/tasks.ts";
-import { useReleaseBoardStore } from "@/store/releaseBoardStore.ts";
 
 const formatDate = (date?: Date | null): string => {
     if (!date) return "";
@@ -50,21 +49,16 @@ interface DatesPopoverProps {
 }
 
 const DatesPopover = ({ taskId, taskStartDate, taskDueDate }: DatesPopoverProps) => {
-    const [range, setRange] = useState<DateRange | undefined>({
-        from: toDate(taskStartDate),
-        to: toDate(taskDueDate),
-    });
+    const range = useMemo<DateRange>(() => ({ from: toDate(taskStartDate), to: toDate(taskDueDate) }), [taskStartDate, taskDueDate]);
     const [draft, setDraft] = useState<{ key: Field; text: string } | null>(null);
     const [month, setMonth] = useState<Date>(toDate(taskStartDate) ?? new Date());
     const [activeField, setActiveField] = useState<Field | null>(null);
-    const updateTask = useReleaseBoardStore((state) => state.updateTask);
 
     const applyRange = (next: DateRange | undefined) => {
-        tasksApi.update(taskId, { start_date: toApi(next?.from), due_date: toApi(next?.to) }, (response) => {
-            setRange(next);
-            setDraft(null);
-            updateTask(taskId, response.task);
-        });
+        const changes = { start_date: toApi(next?.from), due_date: toApi(next?.to) };
+
+        setDraft(null);
+        tasksApi.update(taskId, changes, () => {});
     };
 
     const handleDayClick = (day: Date) => {

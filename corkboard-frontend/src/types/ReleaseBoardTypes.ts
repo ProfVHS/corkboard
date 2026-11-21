@@ -24,5 +24,3 @@ export type Column = {
 };
 
 export type TaskStatus = "backlog" | "todo" | "in_progress" | "review_pending" | "testing" | "adjustments" | "accepted";
-
-export type ReleaseTasks = Record<TaskStatus, TaskType[]>;
