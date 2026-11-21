@@ -14,3 +14,7 @@ export const taskKeys = {
     board: (releaseId?: string) => ["releases", releaseId, "tasks"] as const,
     backlog: (workspaceId?: string) => ["workspaces", workspaceId, "backlog"] as const,
 };
+
+export const tagKeys = {
+    list: (workspaceId?: string) => ["workspaces", workspaceId, "tags"] as const,
+};

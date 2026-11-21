@@ -1,5 +1,4 @@
 import type { User } from "../context/auth/types.ts";
-import type { TagType } from "./TagType.ts";
 
 export type Priority = "low" | "medium" | "high" | "urgent";
 
@@ -13,7 +12,7 @@ export type TaskType = {
     priority: string | null;
     code_name: string;
     user: User | null;
-    tags: TagType[];
+    tags: string[];
     start_date: string | null;
     due_date: string | null;
 };

@@ -83,7 +83,7 @@ class Task < ApplicationRecord
       due_date: due_date,
       release_id: release_id,
       workspace_id: workspace_id,
-      tags: tags.map { |t| { id: t.id, name: t.name, color: t.color } }, # dopasuj do TagType
+      tags: tag_ids,
       user: user && { id: user.id, username: user.username }
     }
   end

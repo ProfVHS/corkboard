@@ -9,13 +9,14 @@ import { ContextMenu, type ContextMenuItem } from "@/ui/ContextMenu/ContextMenu.
 import { useTaskStore } from "@/store/taskStore.ts";
 import { Icon } from "@/ui/Icons/Icon.tsx";
 import UserPopover from "@/ui/Popovers/UserPopover/UserPopover.tsx";
-import Tag from "@/ui/Tag/Tag.tsx";
 import { useAuth } from "@/context/auth/useAuth.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import tasksApi from "@/api/tasks.ts";
 import { useCurrentRelease, useNextRelease } from "@/query/useReleases.ts";
 import type { TaskType } from "@/types/ReleaseBoardTypes.ts";
 import { useTasksCache } from "@/query/useTasks.ts";
+import { useTaskTags } from "@/query/useTags.ts";
+import Tag from "@/ui/Tag/Tag.tsx";
 
 type TaskProps = {
     task: TaskType;
@@ -40,6 +41,7 @@ export const Task = memo(({ task }: TaskProps) => {
     const workspace = useWorkspaceStore((state) => state.workspace);
     const { data: currentRelease } = useCurrentRelease(workspace?.id);
     const { data: nextRelease } = useNextRelease(workspace?.id);
+    const { data: tags = [] } = useTaskTags(task.tags);
     const { updateTask } = useTasksCache();
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -141,12 +143,12 @@ export const Task = memo(({ task }: TaskProps) => {
 
                     {user?.preferences.show_board_tags && (
                         <>
-                            {task.tags.slice(0, 3).map((tag) => (
+                            {tags.slice(0, 3).map((tag) => (
                                 <Tag key={tag.id} tag={tag} />
                             ))}
-                            {task.tags.length > 3 && (
+                            {tags.length > 3 && (
                                 <div className="tag">
-                                    <span>+{task.tags.length - 3}</span>
+                                    <span>+{tags.length - 3}</span>
                                 </div>
                             )}
                         </>

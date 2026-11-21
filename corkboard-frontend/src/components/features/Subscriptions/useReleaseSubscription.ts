@@ -6,7 +6,7 @@ import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 
 type ReleaseEvent =
     | {
-          type: "create_task" | "update_task";
+          type: "create_task" | "update_task" | "update_task_tag";
           actor_id: string;
           task: TaskType;
       }
@@ -49,6 +49,7 @@ const useReleaseSubscription = (releaseId?: string | null) => {
                             addTask(event.task);
                             break;
                         case "update_task":
+                        case "update_task_tag":
                             updateTask(event.task.id, event.task);
                             break;
                         case "delete_task":

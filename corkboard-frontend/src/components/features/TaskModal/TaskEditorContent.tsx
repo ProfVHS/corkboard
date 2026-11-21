@@ -4,8 +4,6 @@ import { useAuth } from "@/context/auth/useAuth.ts";
 import { CollaborativeEditor } from "../CollaborativeEditor/CollaborativeEditor.tsx";
 import Loading from "@/ui/Loading/Loading.tsx";
 import TaskProperties from "../TaskProperties/TaskProperties.tsx";
-import { useWorkspaceStore } from "@/store/workspaceStore.ts";
-import { useCurrentRelease } from "@/query/useReleases.ts";
 import { useTask } from "@/query/useTasks.ts";
 import { useEffect, useState } from "react";
 import tasksApi from "@/api/tasks.ts";
@@ -17,10 +15,7 @@ interface TaskEditorContentProps {
 
 export const TaskEditorContent = ({ taskId, className }: TaskEditorContentProps) => {
     const { user, token } = useAuth();
-    const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
-    const { data: release } = useCurrentRelease(workspaceId);
-
-    const { task } = useTask(taskId, release?.id, workspaceId);
+    const { task } = useTask(taskId);
 
     const [documentId, setDocumentId] = useState<string | null>(null);
     const [isDocumentReady, setIsDocumentReady] = useState(false);

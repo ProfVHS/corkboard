@@ -6,6 +6,8 @@ import type { ReleaseType } from "@/types/ReleaseType.ts";
 import { useCurrentRelease, useReleasesCache } from "@/query/useReleases.ts";
 import { useBacklogCache, useTasksCache } from "@/query/useTasks.ts";
 import type { TaskType } from "@/types/ReleaseBoardTypes.ts";
+import type { TagType } from "@/types/TagType.ts";
+import { useTagsCache } from "@/query/useTags.ts";
 
 type WorkspaceEvent =
     | {
@@ -29,7 +31,7 @@ type WorkspaceEvent =
           releases: ReleaseType[];
       }
     | {
-          type: "create_backlog_task" | "update_backlog_task";
+          type: "create_backlog_task" | "update_backlog_task" | "update_backlog_task_tag";
           actor_id: string;
           task: TaskType;
       }
@@ -43,14 +45,20 @@ type WorkspaceEvent =
           actor_id: string;
           board_tasks: TaskType[];
           backlog_tasks: TaskType[];
+      }
+    | {
+          type: "create_tag" | "update_tag" | "delete_tag";
+          actor_id: string;
+          tag: TagType;
       };
 
 const useWorkspaceSubscription = (workspaceId?: string | null) => {
     const { data: release } = useCurrentRelease(workspaceId!);
     const { addInvitedUser, removeInvitedUser, addCollaborator, removeCollaborator } = useCollaboratorsCache(workspaceId!);
     const { addRelease, updateRelease, setReleases } = useReleasesCache(workspaceId!);
-    const { addTask, setTasks: setBacklogTasks } = useBacklogCache(workspaceId!);
+    const { addTask, updateTask, setTasks: setBacklogTasks } = useBacklogCache(workspaceId!);
     const { setTasks: setBoardTasks } = useTasksCache(release?.id);
+    const { addTag, updateTag, removeTag } = useTagsCache(workspaceId!);
 
     useEffect(() => {
         if (!workspaceId) return;
@@ -101,7 +109,8 @@ const useWorkspaceSubscription = (workspaceId?: string | null) => {
                             addTask(event.task);
                             break;
                         case "update_backlog_task":
-                            addTask(event.task);
+                        case "update_backlog_task_tag":
+                            updateTask(event.task.id, event.task);
                             break;
                         case "delete_backlog_task":
                         case "move_backlog_task":
@@ -110,6 +119,15 @@ const useWorkspaceSubscription = (workspaceId?: string | null) => {
                         case "move_between_task":
                             setBoardTasks(event.board_tasks);
                             setBacklogTasks(event.backlog_tasks);
+                            break;
+                        case "create_tag":
+                            addTag(event.tag);
+                            break;
+                        case "update_tag":
+                            updateTag(event.tag.id, event.tag);
+                            break;
+                        case "delete_tag":
+                            removeTag(event.tag.id);
                             break;
                         default:
                             console.error(event);

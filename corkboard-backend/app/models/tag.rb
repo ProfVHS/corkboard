@@ -25,4 +25,12 @@ class Tag < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { scope: :workspace_id }
   validates :color, presence: true
+
+  def as_broadcast
+    {
+      id: id,
+      name: name,
+      color: color
+    }
+  end
 end

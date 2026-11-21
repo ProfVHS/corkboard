@@ -3,6 +3,8 @@ import { useQuery, useQueryClient, type QueryClient, useQueries } from "@tanstac
 import type { TaskStatus, TaskType } from "@/types/ReleaseBoardTypes.ts";
 import { taskKeys } from "@/query/queryKeys.ts";
 import { api } from "@/api";
+import { useWorkspaceStore } from "@/store/workspaceStore.ts";
+import { useCurrentRelease } from "@/query/useReleases.ts";
 
 const COLUMN_ORDER: TaskStatus[] = ["adjustments", "todo", "in_progress", "review_pending", "testing", "accepted"];
 const bySort = (a: TaskType, b: TaskType) => a.position - b.position;
@@ -65,18 +67,25 @@ export function useRefreshTasks(workspaceId?: string) {
     );
 }
 
-export function useTask(taskId: string, releaseId?: string, workspaceId?: string) {
-    const results = useQueries({
+const fetchBoard = async (releaseId?: string) => (await api.get<TaskType[]>(`/tasks`, { params: { release_id: releaseId } })).data;
+const fetchBacklog = async (workspaceId?: string) => (await api.get<TaskType[]>(`/workspaces/${workspaceId}/backlog`)).data;
+
+export function useTask(taskId: string) {
+    const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
+    const { data: currentRelease } = useCurrentRelease(workspaceId);
+    const releaseId = currentRelease?.id;
+
+    return useQueries({
         queries: [
             {
                 queryKey: taskKeys.board(releaseId),
-                queryFn: async () => (await api.get<TaskType[]>(`/releases/${releaseId}/tasks`)).data,
+                queryFn: () => fetchBoard(releaseId),
                 enabled: !!releaseId,
                 staleTime: 5 * 60 * 1000,
             },
             {
                 queryKey: taskKeys.backlog(workspaceId),
-                queryFn: async () => (await api.get<TaskType[]>(`/workspaces/${workspaceId}/backlog`)).data,
+                queryFn: () => fetchBacklog(workspaceId),
                 enabled: !!workspaceId,
                 staleTime: 5 * 60 * 1000,
             },
@@ -86,6 +95,4 @@ export function useTask(taskId: string, releaseId?: string, workspaceId?: string
             isLoading: results.some((r) => r.isLoading),
         }),
     });
-
-    return results;
 }
