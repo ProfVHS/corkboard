@@ -1,4 +1,4 @@
-@use '../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 .release {
   position: relative;
@@ -58,11 +58,7 @@
   }
 
   .progress {
-    width: 50%;
-
-    @media (max-width: 768px) {
-      width: 100%;
-    }
+    width: 200px;
   }
 
   &--not-draggable{
