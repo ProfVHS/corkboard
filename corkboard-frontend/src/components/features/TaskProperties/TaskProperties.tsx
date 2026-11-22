@@ -35,7 +35,11 @@ const TaskProperties = ({ task }: TaskPropertiesProps) => {
             id: "code_name",
             name: "Code name",
             icon: "hash",
-            component: <div onClick={handleCopyTaskCodeName}>{task.code_name}</div>,
+            component: (
+                <div className="code-name" onClick={handleCopyTaskCodeName}>
+                    {task.code_name}
+                </div>
+            ),
         },
         {
             id: "assign",
