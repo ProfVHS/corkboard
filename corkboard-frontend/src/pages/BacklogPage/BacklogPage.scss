@@ -1,6 +1,8 @@
-@use '../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 .backlog-page {
+  min-width: 700px;
+
   .page__content {
     display: flex;
     flex-direction: row;
