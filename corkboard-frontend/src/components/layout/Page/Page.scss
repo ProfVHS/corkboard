@@ -6,7 +6,7 @@
   height: 100vh;
   box-sizing: border-box;
 
-  &__header {
+  > .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -19,18 +19,18 @@
     font-size: 14px;
     color: rgba(#fff, 0.25);
     background: #030303;
+
+    .sub-title {
+      color: rgba(#fff, 0.6);
+    }
+
+    .buttons {
+      margin-left: auto;
+      width: fit-content !important;
+    }
   }
 
-  &__sub-title {
-    color: rgba(#fff, 0.6);
-  }
-
-  &__buttons {
-    margin-left: auto;
-    width: fit-content !important;
-  }
-
-  &__content {
+  > .content {
     flex: 1 1 auto;
     min-height: 0;
     min-width: 0;

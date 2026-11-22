@@ -52,7 +52,7 @@ export const CurrentReleasePage = () => {
         <Page title="Current Release" subTitle={currentRelease?.name} className="current-release" buttons={renderOptionsButtons()}>
             {currentRelease && <ReleaseBoard releaseId={currentRelease.id} />}
             {!currentRelease && (
-                <div className="current-release__no-active">
+                <div className="no-active">
                     <span>There is no active release</span>
                     <Button onClick={() => setShowCreateReleaseModal(true)}>Create Release</Button>
                 </div>

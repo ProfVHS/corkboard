@@ -47,14 +47,14 @@ export const ReleasesPage = () => {
 
     return (
         <Page title="Releases" className="releases">
-            <div className="releases__content">
-                <div className="releases__list">
+            <div className="content">
+                <div className="list">
                     <Row>
                         Releases
                         <Button variant="square" color="outlined" size="large" onClick={() => setShowCreateReleaseModal(true)}>
                             Create a new Release
                         </Button>
-                        <div className="releases__tabs">
+                        <div className="tabs">
                             <Button variant="square" color="outlined" size="large">
                                 Not Queued
                             </Button>
@@ -73,7 +73,7 @@ export const ReleasesPage = () => {
                     />
                 </div>
 
-                <div className="releases__list">
+                <div className="list">
                     Queue
                     <ReleaseList
                         columnId="QUEUED"
