@@ -3,11 +3,11 @@
 
   overflow-y: auto;
 
-  &__body {
-    margin-top: 20px;
+  .body {
+    margin-top: 10px;
   }
 
-  &__page {
+  .item {
     position: relative;
 
     display: flex;
@@ -18,15 +18,22 @@
     width: 100%;
     font-size: 0.9rem;
     box-sizing: border-box;
-    padding-left: 0.6rem;
-    padding-top: 0.2rem;
-    padding-bottom: 0.2rem;
+    padding: 0.2rem 0.6rem;
 
     color: rgba(255, 255, 255, 0.4);
     border-radius: 0.4rem;
 
     .icon {
       width: 1.5rem;
+    }
+
+    .name {
+      flex: 1;
+      min-width: 0;
+      max-width: 70%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     .button {
@@ -64,7 +71,7 @@
     }
   }
 
-  &__create {
+  .create {
     width: 100%;
     background: none;
     color: #6C6C6C;

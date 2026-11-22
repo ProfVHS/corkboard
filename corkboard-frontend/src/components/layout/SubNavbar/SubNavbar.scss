@@ -1,4 +1,4 @@
-@use '../../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 .sub-navbar {
   width: 180px;
@@ -8,12 +8,12 @@
   border-right: 1px solid rgba(#fff, 0.05);
   padding: 0.8rem 0.4rem;
 
-  &__header {
+  .header {
     font-weight: normal;
     color: #fff;
   }
 
-  &__title {
+  .title {
     font-size: 0.9rem;
     font-weight: normal;
 
@@ -23,7 +23,7 @@
     color: #646464;
   }
 
-  &__body {
+  .body {
     width: 100%;
     list-style: none;
     padding: 0;

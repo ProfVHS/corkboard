@@ -41,13 +41,13 @@ const DocumentPage = ({ document, onUpdate }: DocumentPageProps) => {
 
             <div className={classNames("document-page", { hidden: !isDocumentReady })}>
                 <Input
-                    className="document-page__title"
+                    className="name"
                     value={documentName}
                     onChange={(e) => setDocumentName(e.target.value)}
                     onBlur={(e) => handleUpdateDocumentName(e.target.value)}
                 />
 
-                <div className="document-page__owner">
+                <div className="owner">
                     <UserAvatar username={document.owner.username} />
                     <span>{document.owner.username}</span>
                     <div className="dot"></div>

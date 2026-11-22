@@ -1,7 +1,10 @@
 .collaborative-editor {
   .bubble-menu {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
+    max-width: calc(100vw - 1rem);
+    box-sizing: border-box;
 
     padding: 5px 5px;
 
@@ -31,6 +34,14 @@
         background-color: #2b2b2b;
       }
     }
+
+    @media (pointer: coarse) {
+      .bubble-item {
+        width: 36px;
+        min-width: 36px;
+        height: 36px;
+      }
+    }
   }
 
   .collaboration-carets__caret {
@@ -54,7 +65,26 @@
 
   .ProseMirror {
     width: 100%;
+    min-width: 0;
     outline: none;
+    overflow-wrap: anywhere;
+    font-size: 1rem;
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    pre {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+    }
 
     p {
       line-height: 1.75;
