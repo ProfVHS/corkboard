@@ -96,13 +96,13 @@ export const ReleaseList = ({ columnId, releases, onMove, onEdit, onDelete }: Re
                             key={release.id}
                             transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
                         >
-                            {dragOverIndex === index && <div className="release-list__placeholder" />}
+                            {dragOverIndex === index && <div className="placeholder" />}
                             <Release key={release.id} release={release} onEditClick={() => onEdit(release)} onDeleteClick={() => onDelete(release)} />
                         </motion.div>
                     ))}
             </LayoutGroup>
-            {dragOverIndex === releases.length && releases.find((r) => r.id) && <div className="release-list__placeholder" />}
-            <div className={ClassNames("release-list__dropzone", { active: dragOverIndex === releases.length })}>Drop Release Here to remove it from queue</div>
+            {dragOverIndex === releases.length && releases.find((r) => r.id) && <div className="placeholder" />}
+            <div className={ClassNames("dropzone", { active: dragOverIndex === releases.length })}>Drop Release Here to remove it from queue</div>
         </motion.div>
     );
 };
