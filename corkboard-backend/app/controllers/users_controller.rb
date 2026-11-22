@@ -4,9 +4,12 @@ class UsersController < ApplicationController
 
   def me
     @user = current_user
-    @workspace = @user.last_workspace
-    @release = @workspace.current_release
-    @next_release = @workspace.next_release
+
+    if @user.role == "user"
+      @workspace = @user.last_workspace
+      @release = @workspace.current_release
+      @next_release = @workspace.next_release
+    end
   end
 
   def index

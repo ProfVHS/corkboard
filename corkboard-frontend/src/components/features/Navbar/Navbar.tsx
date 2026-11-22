@@ -63,6 +63,8 @@ export const Navbar = () => {
     }, [isMenuOpen, setMenuOpen, showUserModal]);
 
     useEffect(() => {
+        if (user?.role === "superadmin") return;
+
         workspacesApi.getAll((response) => {
             const storageId = localStorage.getItem("workspace_id");
             setWorkspaces(response);
@@ -112,11 +114,13 @@ export const Navbar = () => {
                 </>
             )}
 
-            {user && workspace && (
+            {user && (
                 <>
                     <div className="user">
                         <ProfilePopover />
-                        <UserNotifications workspaceId={workspace.id} updateWorkspaces={(workspace: WorkspaceType) => workspaces.push(workspace)} />
+                        {workspace && (
+                            <UserNotifications workspaceId={workspace.id} updateWorkspaces={(workspace: WorkspaceType) => workspaces.push(workspace)} />
+                        )}
                     </div>
                 </>
             )}

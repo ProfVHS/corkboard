@@ -3,11 +3,18 @@ import { UserAvatar } from "@/ui/UserAvatar/UserAvatar.tsx";
 import { Icon } from "@/ui/Icons/Icon.tsx";
 import Popover from "@/ui/Popover/Popover.tsx";
 import useProfilePopover from "./useProfilePopover.ts";
+import type { ReactNode } from "react";
+
+type ProfilePopoverItem = {
+    icon: ReactNode;
+    label: string;
+    onClick: () => void;
+};
 
 const ProfilePopover = () => {
     const { user, handleProfile, handleLogout } = useProfilePopover();
     const items = [
-        {
+        user?.role === "user" && {
             icon: <Icon icon="circleUser" />,
             label: "Profile",
             onClick: handleProfile,
@@ -17,7 +24,7 @@ const ProfilePopover = () => {
             label: "Logout",
             onClick: handleLogout,
         },
-    ];
+    ].filter(Boolean) as ProfilePopoverItem[];
 
     if (!user) return null;
 

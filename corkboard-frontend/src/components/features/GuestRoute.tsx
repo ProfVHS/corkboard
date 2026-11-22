@@ -12,10 +12,12 @@ const GuestRoute = ({ children }: { children: React.ReactNode }) => {
 
     if (loading) return <Loading overlay={true} />;
 
-    if (user) {
-        const workspaceId = workspace?.id;
+    if (user && user.role === "user" && workspace) {
+        return <Navigate to={`/workspaces/${workspace.id}/current_release`} replace />;
+    }
 
-        return workspaceId ? <Navigate to={`/workspaces/${workspaceId}/current_release`} replace /> : <Navigate to="/settings/user/profile" replace />;
+    if (user && user.role === "superadmin") {
+        return <Navigate to={`/superadmin`} replace />;
     }
 
     return <>{children}</>;

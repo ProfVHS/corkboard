@@ -1,8 +1,10 @@
 json.user do
   json.partial! "users/user", user: @user
 end
-json.workspace do
-  json.partial! "workspaces/workspace", workspace: @workspace
+if @workspace.present?
+  json.workspace do
+    json.partial! "workspaces/workspace", workspace: @workspace
+  end
 end
 if @release.present?
   json.release do
