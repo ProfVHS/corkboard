@@ -54,11 +54,11 @@ export const Release = ({ release, onDeleteClick, onEditClick, isNotDraggable }:
     return (
         <ContextMenu items={contextMenuOptions()}>
             <div className={ClassNames("release", { ghost: isDragging, "not-draggable": isNotDraggable })} ref={isNotDraggable ? null : ref}>
-                <div className="release__name">
-                    <div className="release__number">{release.position + 1}</div>
+                <div className="name">
+                    <div className="number">{release.position + 1}</div>
                     {release.name}
                     <div
-                        className={ClassNames("release__badge", {
+                        className={ClassNames("badge", {
                             current: release.current,
                             next: release.next,
                         })}
@@ -68,7 +68,7 @@ export const Release = ({ release, onDeleteClick, onEditClick, isNotDraggable }:
                     </div>
                 </div>
 
-                <Progress className="release__progress" maxValue={release.progress?.tasks} value={release.progress?.accepted_tasks} />
+                <Progress className="progress" maxValue={release.progress?.tasks} value={release.progress?.accepted_tasks} />
             </div>
         </ContextMenu>
     );

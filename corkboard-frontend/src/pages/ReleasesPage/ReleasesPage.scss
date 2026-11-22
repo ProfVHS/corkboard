@@ -1,39 +1,44 @@
-@use '../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 .releases {
-
-  &__tabs{
-    display: flex;
-    gap: 1rem;
-    margin-left: auto;
-    align-items: center;
-  }
-
-  &__content {
-    display: flex;
-    justify-content: center;
-
+  .content {
     width: 100%;
     height: 100%;
-
     box-sizing: border-box;
 
-    gap: 1rem;
-  }
-
-  &__list {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: stretch;
     gap: 1rem;
 
-    border: 1px solid colors.$border-color;
-    border-radius: 0.5rem;
-    width: 50%;
-    height: 100%;
-    min-width: 0;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.01);
+    background-color: #060606;
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 0;
+      box-sizing: border-box;
+
+      border: 1px solid colors.$border-color;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.01);
+      overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      height: auto;
+      overflow-y: auto;
+
+      .list {
+        flex: none;
+        overflow-y: visible;
+      }
+    }
   }
-
-
 }

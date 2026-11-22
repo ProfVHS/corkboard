@@ -47,42 +47,31 @@ export const ReleasesPage = () => {
 
     return (
         <Page title="Releases" className="releases">
-            <div className="releases__content">
-                <div className="releases__list">
-                    <Row>
-                        Releases
-                        <Button variant="square" color="outlined" size="large" onClick={() => setShowCreateReleaseModal(true)}>
-                            Create a new Release
-                        </Button>
-                        <div className="releases__tabs">
-                            <Button variant="square" color="outlined" size="large">
-                                Not Queued
-                            </Button>
+            <div className="list">
+                <Row>
+                    <span>Releases</span>
+                    <Button variant="square" color="outlined" size="large" onClick={() => setShowCreateReleaseModal(true)}>
+                        Create a new Release
+                    </Button>
+                </Row>
+                <ReleaseList
+                    columnId="NOT_QUEUED"
+                    releases={releases!.filter((r) => r.status !== "QUEUED")}
+                    onMove={setReleases}
+                    onEdit={setReleaseToEdit}
+                    onDelete={setReleaseToDelete}
+                />
+            </div>
 
-                            <Button variant="square" color="outlined" size="large">
-                                Completed
-                            </Button>
-                        </div>
-                    </Row>
-                    <ReleaseList
-                        columnId="NOT_QUEUED"
-                        releases={releases!.filter((r) => r.status !== "QUEUED")}
-                        onMove={setReleases}
-                        onEdit={setReleaseToEdit}
-                        onDelete={setReleaseToDelete}
-                    />
-                </div>
-
-                <div className="releases__list">
-                    Queue
-                    <ReleaseList
-                        columnId="QUEUED"
-                        releases={releases!.filter((r) => r.status !== "NOT_QUEUED")}
-                        onMove={setReleases}
-                        onEdit={setReleaseToEdit}
-                        onDelete={setReleaseToDelete}
-                    />
-                </div>
+            <div className="list">
+                Queue
+                <ReleaseList
+                    columnId="QUEUED"
+                    releases={releases!.filter((r) => r.status !== "NOT_QUEUED")}
+                    onMove={setReleases}
+                    onEdit={setReleaseToEdit}
+                    onDelete={setReleaseToDelete}
+                />
             </div>
             {showCreateReleaseModal && <CreateModal title="Create new release" onSave={handleSave} onClose={() => setShowCreateReleaseModal(false)} />}
             {releaseToDelete && (

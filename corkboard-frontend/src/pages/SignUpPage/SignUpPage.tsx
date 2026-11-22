@@ -42,13 +42,13 @@ export const SignUpPage = () => {
 
     return (
         <div className="signup-page">
-            <div className="signup-page__content">
-                <div className="signup-page__header">
-                    <Icon icon="appLogo" className="login-page__app-logo" />
-                    <div className="signup-page__app-name">Corkboard</div>
-                    <div className="signup-page__horizontal-line" />
+            <div className="content">
+                <div className="header">
+                    <Icon icon="appLogo" />
+                    <div className="name">Corkboard</div>
+                    <div className="horizontal-line" />
                 </div>
-                <div className="signup-page__description">Manage your project with easy to use App</div>
+                <div className="description">Manage your project with easy to use App</div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <LabeledInput label="Username" require={true} isInvaild={!!errors.username} register={register("username")} />
                     <LabeledInput label="Password" type="password" require={true} isInvaild={!!errors.password} register={register("password")} />
@@ -63,13 +63,13 @@ export const SignUpPage = () => {
                         Sign up
                     </Button>
                 </form>
-                <div className="signup-page__errors">
-                    {errors.username && <span className="signup-page__error">{errors.username.message}</span>}
-                    {errors.password && <span className="signup-page__error">{errors.password.message}</span>}
-                    {errors.confirmPassword && <span className="signup-page__error">{errors.confirmPassword.message}</span>}
+                <div className="errors">
+                    {errors.username && <span className="error">{errors.username.message}</span>}
+                    {errors.password && <span className="error">{errors.password.message}</span>}
+                    {errors.confirmPassword && <span className="error">{errors.confirmPassword.message}</span>}
                 </div>
 
-                <div className="signup-page__sign-up">
+                <div className="login">
                     <span className="small-text">You already have an account?</span>
                     <Button variant="text" onClick={() => navigate("/")}>
                         Log In

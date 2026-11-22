@@ -1,29 +1,26 @@
-import "./Page.scss"
+import "./Page.scss";
 import { ClassNames } from "@/global/utils.ts";
 import { Row } from "@/layout/Row/Row.tsx";
 
 type PageProps = {
-    title: string
-    subTitle?: string
-    children?: React.ReactNode
-    className?: string
-    buttons?: React.ReactNode
-}
+    title: string;
+    subTitle?: string;
+    children?: React.ReactNode;
+    className?: string;
+    buttons?: React.ReactNode;
+};
 
-export const Page = ({title, subTitle, children, buttons, className}: PageProps) => {
+export const Page = ({ title, subTitle, children, buttons, className }: PageProps) => {
     return (
         <div className={ClassNames("page", className)}>
-            <div className="page__header">
-                <span className="page__title">
-                    {title}{subTitle ? ":" : ""} <span className="page__sub-title">{subTitle}</span>
+            <div className="header">
+                <span className="title">
+                    {title}
+                    {subTitle ? ":" : ""} <span className="sub-title">{subTitle}</span>
                 </span>
-                <Row className="page__buttons">
-                    {buttons}
-                </Row>
+                <Row className="buttons">{buttons}</Row>
             </div>
-            <div className="page__content">
-                {children}
-            </div>
+            <div className="content">{children}</div>
         </div>
-    )
-}
+    );
+};

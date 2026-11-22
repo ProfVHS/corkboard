@@ -34,14 +34,13 @@ const DocumentsNav = ({ documents, onAdd }: DocumentNavProps) => {
 
     return (
         <SubNavbar className="documents-nav">
-            <SubNavbar.Header header="Documents" />
-
-            <SubNavbar.Body className="documents-nav__body">
+            <SubNavbar.Body>
                 {documents.length > 0 &&
                     documents.map((document) => (
-                        <NavLink className="documents-nav__page" to={`/workspaces/${workspace?.id}/documents/${document.id}`}>
+                        <NavLink className="item" to={`/workspaces/${workspace?.id}/documents/${document.id}`}>
                             <Icon icon="document" />
-                            {document.name}
+
+                            <span className="name">{document.name}</span>
 
                             <Button onClick={() => handleDeleteDocument(document.id)}>
                                 <Icon icon="trash" />
@@ -49,7 +48,7 @@ const DocumentsNav = ({ documents, onAdd }: DocumentNavProps) => {
                         </NavLink>
                     ))}
 
-                <Button className="documents-nav__create" onClick={handleCreateDocument}>
+                <Button className="create" onClick={handleCreateDocument}>
                     + Add Document
                 </Button>
             </SubNavbar.Body>

@@ -16,7 +16,7 @@ interface SubNavbarHeaderProps {
 }
 
 SubNavbar.Header = ({ header, className }: SubNavbarHeaderProps) => {
-    return <div className={classNames("sub-navbar__header", className)}>{header}</div>;
+    return <div className={classNames("header", className)}>{header}</div>;
 };
 
 interface SubNavbarTitleProps {
@@ -25,11 +25,11 @@ interface SubNavbarTitleProps {
 }
 
 SubNavbar.Title = ({ title, className }: SubNavbarTitleProps) => {
-    return <div className={classNames("sub-navbar__title", className)}>{title}</div>;
+    return <div className={classNames("title", className)}>{title}</div>;
 };
 
 SubNavbar.Body = ({ children, className }: SubNavbarProps) => {
-    return <div className={classNames("sub-navbar__body", className)}>{children}</div>;
+    return <div className={classNames("body", className)}>{children}</div>;
 };
 
 export default SubNavbar;

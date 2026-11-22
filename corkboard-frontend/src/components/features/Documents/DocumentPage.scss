@@ -1,37 +1,43 @@
 .document-page {
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
 
-  padding: 75px;
+  padding: clamp(16px, 5vw, 75px);
 
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: clamp(12px, 2vw, 20px);
 
   overflow-y: auto;
+  overflow-x: hidden;
 
   &.hidden {
     display: none;
   }
 
-  &__title {
-    font-size: 42px;
+  .name {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    font-size: clamp(1.75rem, 6vw, 2.625rem);
+    line-height: 1.2;
     border: none;
     background: none;
   }
 
-  &__owner {
+  .owner {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 6px 10px;
+    margin-bottom: clamp(8px, 2vw, 20px);
 
     .dot {
       width: 5px;
       height: 5px;
-
+      flex-shrink: 0;
       margin: 0 5px;
-
       border-radius: 50%;
       background-color: #2e2e2e;
     }

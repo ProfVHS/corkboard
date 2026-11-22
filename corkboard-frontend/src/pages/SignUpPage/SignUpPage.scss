@@ -1,4 +1,4 @@
-@use '../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 body {
   background: linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgb(12, 12, 12) 50%, rgba(0, 0, 0, 1) 100%);
@@ -6,102 +6,121 @@ body {
 
 .signup-page {
   display: flex;
-  height: 100vh;
-  width: 100%;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
+  width: 100%;
+  min-height: 100dvh;
+  padding: 1rem;
+  box-sizing: border-box;
+
   background: linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgb(12, 12, 12) 50%, rgba(0, 0, 0, 1) 100%);
 
-  &__content {
+  .content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
 
-    min-width: 300px;
+    width: 100%;
     max-width: 400px;
+    box-sizing: border-box;
 
     background: rgba(255, 255, 255, 0.025);
 
-    padding: 25px;
+    padding: clamp(16px, 5vw, 25px);
     border-radius: 5px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-  }
 
-  &__app-logo{
-    width: 50px;
-  }
-  
-  &__header {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    width: 70%;
-  }
+    .header {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      width: 70%;
 
-  &__description {
-    text-align: center;
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-  }
+      .icon {
+        width: clamp(40px, 12vw, 50px);
+      }
 
-  &__app-name {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.75);
-  }
+      .name {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        font-size: clamp(1.25rem, 5vw, 1.5rem);
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.75);
+        text-align: center;
+      }
 
-  &__horizontal-line {
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, rgb(59, 130, 246) 0%, rgb(59, 130, 246) 50%, rgb(59, 130, 246) 100%);
-  }
-
-  &__sign-up {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    margin-top: 16px;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-
-    width: 50%;
-
-    .labeled-input {
-      width: 100%;
+      .horizontal-line {
+        width: 100%;
+        height: 1px;
+        background: rgb(59, 130, 246);
+      }
     }
 
-    .button {
+    .description {
+      text-align: center;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
       width: 100%;
+
+      .labeled-input {
+        width: 70%;
+      }
+
+      .button {
+        width: 70%;
+      }
+    }
+
+    .errors {
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      flex-direction: column;
+      width: 100%;
+
+      .error {
+        color: colors.$red;
+        font-size: 12px;
+        text-align: center;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    .login {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      margin-top: 16px;
     }
   }
 
-  &__errors{
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    width: 100%;
-  }
+  @media (max-width: 400px) {
+    padding: 0.5rem;
 
-  &__error{
-    color: colors.$red;
-    font-size: 12px;
-    text-align: center;
+    .content {
+      gap: 0.75rem;
+
+      .header {
+        width: 100%;
+      }
+    }
   }
 }

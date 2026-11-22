@@ -1,7 +1,6 @@
-@use '../../../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 .workspace-list {
-  min-width: 1000px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -11,5 +10,9 @@
     font-size: 1.25rem;
     color: #fff;
     margin-bottom: 1rem;
+  }
+
+  .workspace-avatar {
+    flex-shrink: 0;
   }
 }
