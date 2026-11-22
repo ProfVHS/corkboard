@@ -36,13 +36,13 @@ export const LoginPage = () => {
 
     return (
         <div className="login-page">
-            <div className="login-page__content">
-                <div className="login-page__header">
-                    <Icon icon="appLogo" className="login-page__app-logo" />
-                    <div className="login-page__app-name">Corkboard</div>
-                    <div className="login-page__horizontal-line" />
+            <div className="content">
+                <div className="header">
+                    <Icon icon="appLogo" />
+                    <div className="name">Corkboard</div>
+                    <div className="horizontal-line" />
                 </div>
-                <div className="login-page__description">Manage your project with easy to use App</div>
+                <div className="description">Manage your project with easy to use App</div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <LabeledInput
                         label="Username"
@@ -62,7 +62,7 @@ export const LoginPage = () => {
                     </Button>
                 </form>
 
-                <div className="login-page__sign-up">
+                <div className="sign-up">
                     <span className="small-text">Don't have an account?</span>
                     <Button variant="text" onClick={() => navigate("/signup")}>
                         Sign Up
