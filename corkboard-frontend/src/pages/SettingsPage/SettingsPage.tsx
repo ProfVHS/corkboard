@@ -7,7 +7,7 @@ export const SettingsPage = () => {
         <div className="settings">
             <SettingsNav />
 
-            <div className="settings-content">
+            <div className="content">
                 <Outlet />
             </div>
         </div>
