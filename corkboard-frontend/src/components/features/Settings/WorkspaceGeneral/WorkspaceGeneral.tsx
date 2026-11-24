@@ -95,7 +95,7 @@ const WorkspaceGeneral = () => {
             </div>
 
             <SettingsSection>
-                <SettingsSection.Info title="General" description="COs tam o workspace" />
+                <SettingsSection.Info title="General" description="Basic information about your workspace, visible to all members" />
                 <SettingsSection.Content
                     children={
                         <>
@@ -107,7 +107,7 @@ const WorkspaceGeneral = () => {
             </SettingsSection>
 
             <SettingsSection>
-                <SettingsSection.Info title="other options" description="Enable code prefix" />
+                <SettingsSection.Info title="Workflow" description="Enable code prefix" />
                 <SettingsSection.Content
                     children={
                         <Controller
@@ -149,7 +149,7 @@ const WorkspaceGeneral = () => {
 
             {workspaceOwner && (
                 <SettingsSection>
-                    <SettingsSection.Info title="Danger zone" description="Proceed with caution." />
+                    <SettingsSection.Info title="Danger zone" description="Proceed with caution" />
                     <SettingsSection.Content
                         children={
                             <>

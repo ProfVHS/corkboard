@@ -76,7 +76,7 @@ const UserProfile = () => {
         <div className="user-profile">
             <span className="title">My settings</span>
             <SettingsSection>
-                <SettingsSection.Info title="Profile" description="Your personal information and account security settings." />
+                <SettingsSection.Info title="Profile" description="Your personal information and account security settings" />
                 <SettingsSection.Content
                     className="profile"
                     children={
@@ -95,7 +95,7 @@ const UserProfile = () => {
             </SettingsSection>
 
             <SettingsSection>
-                <SettingsSection.Info title="Preferences" description="Choose how task details should open — as a modal window or a side panel." />
+                <SettingsSection.Info title="Preferences" description="Choose how task details should open — as a modal window or a side panel" />
                 <SettingsSection.Content
                     className="task-display"
                     children={
@@ -138,7 +138,7 @@ const UserProfile = () => {
             </SettingsSection>
 
             <SettingsSection>
-                <SettingsSection.Info title="Danger zone" description="Proceed with caution." />
+                <SettingsSection.Info title="Danger zone" description="Proceed with caution" />
                 <SettingsSection.Content
                     children={
                         <>
