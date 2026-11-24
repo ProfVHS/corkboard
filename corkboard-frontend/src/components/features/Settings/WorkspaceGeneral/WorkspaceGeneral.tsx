@@ -12,6 +12,9 @@ import Switch from "@/ui/Switch/Switch.tsx";
 import workspacesApi from "@/api/workspaces.ts";
 import { api } from "@/api";
 import { useToast } from "@/hooks/useToast.ts";
+import SettingsSection from "@/features/Settings/SettingsSection.tsx";
+import { useState } from "react";
+import ConfirmationModal from "@/ui/Modals/ConfirmationModal.tsx";
 
 const schema = yup
     .object({
@@ -39,6 +42,7 @@ const WorkspaceGeneral = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const setWorkspace = useWorkspaceStore((state) => state.setWorkspace);
+    const [showDeleteModal, setSHowDeleteModal] = useState<boolean>(false);
 
     const {
         register,
@@ -72,6 +76,7 @@ const WorkspaceGeneral = () => {
             (response) => {
                 reset(response);
                 setWorkspace(response);
+                toast.success("Successfully updated workspace");
             },
         );
     };
@@ -80,71 +85,89 @@ const WorkspaceGeneral = () => {
 
     return (
         <div className="workspace-general">
-            <div className="workspace-general__title">
+            <div className="title">
                 Workspace settings
-                <div className="workspace-general__buttons">
+                <div className="buttons">
                     <Button color="primary" disabled={!isDirty} onClick={handleSubmit(onSubmit)}>
                         Save
                     </Button>
                 </div>
             </div>
 
-            <div className="workspace-general__section-title">General</div>
-            <div className="workspace-general__section">
-                <div className="workspace-general__setting">
-                    <span className="workspace-general__label">Avatar</span>
-                    <div className="workspace-general__logo">{getValues("name")?.[0]?.toUpperCase()}</div>
-                </div>
+            <SettingsSection>
+                <SettingsSection.Info title="General" description="COs tam o workspace" />
+                <SettingsSection.Content
+                    children={
+                        <>
+                            <div className="avatar">{getValues("name")?.[0]?.toUpperCase()}</div>
+                            <Input register={register("name")} placeholder="Workspace name" />
+                        </>
+                    }
+                />
+            </SettingsSection>
 
-                <div className="workspace-general__setting">
-                    <span className="workspace-general__label">Name</span>
-                    <Input register={register("name")} placeholder="Workspace name" />
-                </div>
-
-                <div className="workspace-general__setting">
-                    <span className="workspace-general__label">Enable code prefix</span>
-                    <Controller
-                        control={control}
-                        name="code_prefix_enabled"
-                        render={({ field }) => <Switch checked={!!field.value} onChange={(checked) => field.onChange(checked)} />}
-                    />
-                </div>
+            <SettingsSection>
+                <SettingsSection.Info title="other options" description="Enable code prefix" />
+                <SettingsSection.Content
+                    children={
+                        <Controller
+                            control={control}
+                            name="code_prefix_enabled"
+                            render={({ field }) => <Switch checked={!!field.value} onChange={(checked) => field.onChange(checked)} />}
+                        />
+                    }
+                />
 
                 {watch("code_prefix_enabled") && (
-                    <div className="workspace-general__setting">
-                        <span className="workspace-general__label">Tasks code prefix</span>
-                        <Input
-                            className="code-prefix"
-                            register={register("code_prefix", {
-                                setValueAs: (value) => value?.toUpperCase() || "",
-                            })}
-                            maxLength={3}
+                    <>
+                        <SettingsSection.Info description="Tasks code prefix" />
+                        <SettingsSection.Content
+                            children={
+                                <Input
+                                    className="code-prefix"
+                                    register={register("code_prefix", {
+                                        setValueAs: (value) => value?.toUpperCase() || "",
+                                    })}
+                                    maxLength={3}
+                                />
+                            }
                         />
-                    </div>
+                    </>
                 )}
 
-                <div className="workspace-general__setting">
-                    <span className="workspace-general__label">Auto assign</span>
-                    <Controller
-                        control={control}
-                        name="auto_assign"
-                        render={({ field }) => <Switch checked={!!field.value} onChange={(checked) => field.onChange(checked)} />}
-                    />
-                </div>
-            </div>
+                <SettingsSection.Info description="Auto assign" />
+                <SettingsSection.Content
+                    children={
+                        <Controller
+                            control={control}
+                            name="auto_assign"
+                            render={({ field }) => <Switch checked={!!field.value} onChange={(checked) => field.onChange(checked)} />}
+                        />
+                    }
+                />
+            </SettingsSection>
 
             {workspaceOwner && (
-                <>
-                    <div className="workspace-general__section-title">Danger zone</div>
-                    <div className="workspace-general__section">
-                        <div className="workspace-general__setting">
-                            <span className="workspace-general__label">Delete this Workspace forever</span>
-                            <Button color="red" onClick={handleDeleteWorkspace}>
-                                Delete
-                            </Button>
-                        </div>
-                    </div>
-                </>
+                <SettingsSection>
+                    <SettingsSection.Info title="Danger zone" description="Proceed with caution." />
+                    <SettingsSection.Content
+                        children={
+                            <>
+                                <Button color="red" onClick={() => setSHowDeleteModal(true)}>
+                                    Delete workspace
+                                </Button>
+                                {showDeleteModal && (
+                                    <ConfirmationModal
+                                        title="Delete workspace?"
+                                        message={<span>???</span>}
+                                        onDelete={handleDeleteWorkspace}
+                                        onClose={() => setSHowDeleteModal(false)}
+                                    />
+                                )}
+                            </>
+                        }
+                    />
+                </SettingsSection>
             )}
         </div>
     );
