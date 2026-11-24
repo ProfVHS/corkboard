@@ -18,3 +18,7 @@ export const taskKeys = {
 export const tagKeys = {
     list: (workspaceId?: string) => ["workspaces", workspaceId, "tags"] as const,
 };
+
+export const documentKeys = {
+    list: (workspaceId?: string) => ["workspaces", workspaceId, "documents"] as const,
+};
