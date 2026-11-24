@@ -1,56 +1,40 @@
 import "./Documents.scss";
 import DocumentsNav from "./DocumentsNav/DocumentsNav.tsx";
 import DocumentPage from "./DocumentPage.tsx";
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
-import { useDocumentsSubscription } from "@/features/Documents/useDocumentsSubscription.ts";
-import { useAuth } from "@/context/auth/useAuth.ts";
 import Loading from "@/ui/Loading/Loading.tsx";
-import type { DocumentType } from "@/types/DocumentType.ts";
-import documentsApi from "@/api/documents.ts";
+import { useDocuments, useDocumentsCache } from "@/query/useDocuments.ts";
+import { useEffect } from "react";
 
 export const Documents = () => {
-    const { documentId } = useParams();
-    const { user } = useAuth();
-    const workspace = useWorkspaceStore((state) => state.workspace);
-    const [documents, setDocuments] = useState<DocumentType[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+    const { documentId, workspaceId: workspaceIdParam } = useParams();
+    const workspaceId = useWorkspaceStore((state) => state.workspace?.id);
+    const { data: documents, isLoading } = useDocuments(workspaceId);
+    const { addDocument, updateDocument } = useDocumentsCache(workspaceId);
     const navigate = useNavigate();
 
-    useDocumentsSubscription(workspace?.id, user?.id, setDocuments);
+    const currentDocument = documents?.find((d) => d.id === documentId);
 
     useEffect(() => {
-        if (!workspace) return;
+        if (!documents || documents.length === 0) return;
 
-        documentsApi.getAll(workspace.id, (response) => {
-            setDocuments(response);
-            setLoading(false);
-        });
-    }, [documentId, navigate, workspace]);
+        if (!currentDocument) {
+            navigate(`/workspaces/${workspaceIdParam ?? workspaceId}/documents/${documents[0].id}`, { replace: true });
+        }
+    }, [documents, currentDocument, navigate, workspaceIdParam, workspaceId]);
 
-    if (loading) return <Loading overlay={true} />;
+    if (!documents || isLoading) return <Loading overlay={true} />;
 
     return (
         <div className="documents">
-            <DocumentsNav
-                documents={documents}
-                onAdd={(response) => {
-                    setDocuments((prev) => [...prev, response]);
-                }}
-            />
+            <DocumentsNav documents={documents} onAdd={(response) => addDocument(response)} />
 
-            {documents.length > 0 ? (
-                <DocumentPage
-                    key={documentId}
-                    document={documents.find((d) => d.id === documentId) ?? documents[0]}
-                    onUpdate={(response) => setDocuments((prev) => prev.map((d) => (d.id === response.id ? response : d)))}
-                />
-            ) : documents.length > 0 ? (
-                <div className="page-status">Choose document</div>
-            ) : (
+            {documents.length === 0 ? (
                 <div className="page-status">Create new document</div>
-            )}
+            ) : currentDocument ? (
+                <DocumentPage key={currentDocument.id} document={currentDocument} onUpdate={(response) => updateDocument(response.id, response)} />
+            ) : null}
         </div>
     );
 };

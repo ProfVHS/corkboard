@@ -1,14 +1,16 @@
 import { useEffect } from "react";
 import { cable } from "@/lib/cable.ts";
-import { useCollaboratorsCache } from "@/query/useCollaborators.ts";
 import type { User } from "@/context/auth/types.ts";
 import type { ReleaseType } from "@/types/ReleaseType.ts";
-import { useReleasesCache } from "@/query/useReleases.ts";
-import { useBacklogCache } from "@/query/useTasks.ts";
 import type { TaskType } from "@/types/ReleaseBoardTypes.ts";
 import type { TagType } from "@/types/TagType.ts";
-import { useTagsCache } from "@/query/useTags.ts";
+import type { DocumentType } from "@/types/DocumentType.ts";
 import type { WorkspaceType } from "@/types/WorkspaceType.ts";
+import { useReleasesCache } from "@/query/useReleases.ts";
+import { useBacklogCache } from "@/query/useTasks.ts";
+import { useCollaboratorsCache } from "@/query/useCollaborators.ts";
+import { useTagsCache } from "@/query/useTags.ts";
+import { useDocumentsCache } from "@/query/useDocuments.ts";
 import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import workspacesApi from "@/api/workspaces.ts";
 
@@ -56,6 +58,11 @@ type WorkspaceEvent =
     | {
           type: "delete_workspace";
           actor_id: string;
+      }
+    | {
+          type: "create_document" | "update_document" | "delete_document";
+          actor_id: string;
+          document: DocumentType;
       };
 
 const useWorkspaceSubscription = (workspaceId?: string | null) => {
@@ -63,6 +70,7 @@ const useWorkspaceSubscription = (workspaceId?: string | null) => {
     const { addRelease, updateRelease, setReleases } = useReleasesCache(workspaceId!);
     const { addTask, updateTask, setTasks: setBacklogTasks } = useBacklogCache(workspaceId!);
     const { addTag, updateTag, removeTag } = useTagsCache(workspaceId!);
+    const { addDocument, updateDocument, removeDocument } = useDocumentsCache(workspaceId!);
     const setWorkspace = useWorkspaceStore((state) => state.setWorkspace);
 
     useEffect(() => {
@@ -138,6 +146,15 @@ const useWorkspaceSubscription = (workspaceId?: string | null) => {
                             workspacesApi.getAll((response) => {
                                 setWorkspace(response[0]);
                             });
+                            break;
+                        case "create_document":
+                            addDocument(event.document);
+                            break;
+                        case "update_document":
+                            updateDocument(event.document.id, event.document);
+                            break;
+                        case "delete_document":
+                            removeDocument(event.document.id);
                             break;
                         default:
                             console.error(event);

@@ -13,21 +13,25 @@ class DocumentsController < ApplicationController
   end
 
   def create
-    authorize! :create, Document.new(workspace_id: params[:workspace_id])
+    workspace_id = params[:workspace_id]
+    authorize! :create, Document.new(workspace_id: workspace_id)
 
-    @document = Document.create!(name: "Untilted", owner_id: current_user.id, workspace_id: params[:workspace_id])
-    @document.broadcast("document_created", current_user)
+    @document = Document.create!(name: "Untilted", owner_id: current_user.id, workspace_id: workspace_id)
+
+    WorkspaceBroadcaster.broadcast(workspace_id, "create_document", document: @document.as_broadcast)
     render :show
   end
 
   def update
     @document.update!(document_params)
-    @document.broadcast("document_updated", current_user)
+
+    WorkspaceBroadcaster.broadcast(@document.workspace_id, "update_document", document: @document.as_broadcast)
+
     render :show
   end
 
   def destroy
-    @document.broadcast("document_destroyed", current_user)
+    WorkspaceBroadcaster.broadcast(@document.workspace_id, "delete_document", document: @document.as_broadcast)
     @document.destroy!
     render json: { message: "Successfully deleted!" }
   end

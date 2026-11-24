@@ -26,19 +26,15 @@ class Document < ApplicationRecord
 
   scope :not_task_documents, -> { where(task_id: nil) }
 
-  def broadcast(type, current_user)
-    ActionCable.server.broadcast "documents_#{self.workspace_id}", {
-      type: type,
-      actor_id: current_user&.id,
-      document: {
-        id: self.id,
-        name: self.name,
-        updated_at: self.updated_at,
-        owner: {
-          id: self.owner.id,
-          username: self.owner.username
-        },
-      }
+  def as_broadcast
+    {
+      id: id,
+      name: name,
+      owner: {
+        id: owner_id,
+        username: User.find(owner_id).username
+      },
+      updated_at: updated_at,
     }
   end
 end
