@@ -1,9 +1,8 @@
 import "./Task.scss";
-import { Button } from "@/ui/Button/Button.tsx";
 import { EditableText } from "@/ui/EditableText/EditableText.tsx";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ClassNames } from "@/global/utils.ts";
-import { type SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { ContextMenu, type ContextMenuItem } from "@/ui/ContextMenu/ContextMenu.tsx";
 import { useTaskStore } from "@/store/taskStore.ts";
@@ -14,9 +13,10 @@ import { useWorkspaceStore } from "@/store/workspaceStore.ts";
 import tasksApi from "@/api/tasks.ts";
 import { useCurrentRelease, useNextRelease } from "@/query/useReleases.ts";
 import type { TaskType } from "@/types/ReleaseBoardTypes.ts";
-import { useTasksCache } from "@/query/useTasks.ts";
 import { useTaskTags } from "@/query/useTags.ts";
-import Tag from "@/ui/Tag/Tag.tsx";
+import dayjs from "dayjs";
+import classNames from "classnames";
+import TagList from "@/features/Task/TagList.tsx";
 
 type TaskProps = {
     task: TaskType;
@@ -31,8 +31,11 @@ export const Task = memo(({ task }: TaskProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
-    const headerRef = useRef<HTMLFormElement>(null);
-    const { register, handleSubmit } = useForm<Inputs>();
+    const headerRef = useRef<HTMLDivElement>(null);
+    const commitRef = useRef<() => void>(() => {});
+    const { register, getValues, reset } = useForm<Inputs>({
+        defaultValues: { name: task.name },
+    });
     const { user } = useAuth();
 
     const setIsOpen = useTaskStore((state) => state.setIsOpen);
@@ -42,11 +45,17 @@ export const Task = memo(({ task }: TaskProps) => {
     const { data: currentRelease } = useCurrentRelease(workspace?.id);
     const { data: nextRelease } = useNextRelease(workspace?.id);
     const { data: tags = [] } = useTaskTags(task.tags);
-    const { updateTask } = useTasksCache();
 
-    const onSubmit: SubmitHandler<Inputs> = (data) => {
-        tasksApi.update(taskId, { name: data.name }, (response) => {
-            updateTask(taskId, { name: response.task.name });
+    commitRef.current = () => {
+        const name = (getValues("name") ?? "").trim();
+
+        if (!name || name === task.name) {
+            reset({ name: task.name });
+            setIsEditing(false);
+            return;
+        }
+
+        tasksApi.update(taskId, { name }, () => {
             setIsEditing(false);
         });
     };
@@ -69,14 +78,21 @@ export const Task = memo(({ task }: TaskProps) => {
     }, [isDragging]);
 
     useEffect(() => {
+        if (!isEditing) return;
+
         const handleClickOutside = (event: MouseEvent) => {
             if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
-                setIsEditing(false);
+                commitRef.current();
             }
         };
-        if (isEditing) document.addEventListener("mousedown", handleClickOutside);
+
+        document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [isEditing]);
+
+    useEffect(() => {
+        if (!isEditing) reset({ name: task.name });
+    }, [task.name, isEditing, reset]);
 
     const contextMenuOptions = useCallback(
         (): ContextMenuItem[] =>
@@ -124,38 +140,72 @@ export const Task = memo(({ task }: TaskProps) => {
                     setTaskId(taskId);
                 }}
             >
-                <form className="task__header" ref={headerRef} onClick={(e) => isEditing && e.stopPropagation()} onSubmit={handleSubmit(onSubmit)}>
-                    <EditableText
-                        isEditable={isEditing}
-                        value={task.name}
-                        register={register("name", {
-                            required: "You have to enter a name!",
-                        })}
-                    />
-                    {isEditing && (
-                        <Button type="submit" size="small" color="primary">
-                            Save
-                        </Button>
-                    )}
-                </form>
-                <div className="tags">
+                <div className="header">
+                    <div className="name" ref={headerRef} onClick={(e) => isEditing && e.stopPropagation()}>
+                        <EditableText
+                            isEditable={isEditing}
+                            value={task.name}
+                            register={register("name", {
+                                required: "You have to enter a name!",
+                            })}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") commitRef.current();
+                                if (e.key === "Escape") {
+                                    reset({ name: task.name });
+                                    setIsEditing(false);
+                                }
+                            }}
+                        />
+                    </div>
                     <UserPopover taskId={taskId} taskUser={task.user} />
+                </div>
 
-                    {user?.preferences.show_board_tags && (
-                        <>
-                            {tags.slice(0, 3).map((tag) => (
-                                <Tag key={tag.id} tag={tag} />
-                            ))}
-                            {tags.length > 3 && (
-                                <div className="tag">
-                                    <span>+{tags.length - 3}</span>
-                                </div>
-                            )}
-                        </>
+                <div className="details">
+                    {task.due_date && <div className="date">Due: {dayjs(task.due_date).format("MMM D")}</div>}
+                    {task.priority && (
+                        <div className={classNames("priority", task.priority)}>
+                            <Icon icon="priority" />
+                            <span>{task.priority}</span>
+                        </div>
                     )}
                 </div>
-                {workspace?.code_prefix_enabled && <div className="code-name">{task.code_name}</div>}
-                {task.priority && <Icon className={`${task.priority} priority`} icon="priority" />}
+
+                {workspace?.code_prefix_enabled && <div className="code-prefix">{task.code_name}</div>}
+
+                {user?.preferences.show_board_tags && <TagList tags={tags} />}
+
+                {/*<form className="task__header" ref={headerRef} onClick={(e) => isEditing && e.stopPropagation()} onSubmit={handleSubmit(onSubmit)}>*/}
+                {/*    <EditableText*/}
+                {/*        isEditable={isEditing}*/}
+                {/*        value={task.name}*/}
+                {/*        register={register("name", {*/}
+                {/*            required: "You have to enter a name!",*/}
+                {/*        })}*/}
+                {/*    />*/}
+                {/*    {isEditing && (*/}
+                {/*        <Button type="submit" size="small" color="primary">*/}
+                {/*            Save*/}
+                {/*        </Button>*/}
+                {/*    )}*/}
+                {/*</form>*/}
+                {/*<div className="tags">*/}
+                {/*    <UserPopover taskId={taskId} taskUser={task.user} />*/}
+
+                {/*    {user?.preferences.show_board_tags && (*/}
+                {/*        <>*/}
+                {/*            {tags.slice(0, 3).map((tag) => (*/}
+                {/*                <Tag key={tag.id} tag={tag} />*/}
+                {/*            ))}*/}
+                {/*            {tags.length > 3 && (*/}
+                {/*                <div className="tag">*/}
+                {/*                    <span>+{tags.length - 3}</span>*/}
+                {/*                </div>*/}
+                {/*            )}*/}
+                {/*        </>*/}
+                {/*    )}*/}
+                {/*</div>*/}
+                {/*{workspace?.code_prefix_enabled && <div className="code-name">{task.code_name}</div>}*/}
+                {/*{task.priority && <Icon className={`${task.priority} priority`} icon="priority" />}*/}
             </div>
         </ContextMenu>
     );

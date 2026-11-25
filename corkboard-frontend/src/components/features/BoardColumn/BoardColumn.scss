@@ -1,9 +1,11 @@
-@use '../../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 .board-column {
   height: fit-content;
   max-height: 100%;
+  width: 300px;
   min-width: 300px;
+  max-width: 300px;
 
   display: flex;
   flex-direction: column;

@@ -1,4 +1,4 @@
-@use '../../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 .user-avatar {
   display: flex;
@@ -6,8 +6,8 @@
   align-items: center;
 
   background-color: colors.$primary-color;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 22px;
+  height: 22px;
   border-radius: 0.2rem;
 
   font-size: 1rem;

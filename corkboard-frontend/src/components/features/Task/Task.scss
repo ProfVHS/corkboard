@@ -1,4 +1,4 @@
-@use '../../../global/colors' as colors;
+@use '@/global/colors' as colors;
 
 .task {
   position: relative;
@@ -6,10 +6,9 @@
   justify-content: start;
   align-items: start;
   flex-direction: column;
-  gap: 4px;
 
   padding: 8px;
-  min-height: 50px;
+  min-height: 70px;
   width: 100%;
   background: #0c0c0c;
   border: 1px solid #222222;
@@ -19,56 +18,106 @@
   font-size: 14px;
   cursor: pointer;
 
-  &__header {
+  .header {
+    width: 100%;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    width: 90%;
-  }
 
-  &__user {
-    width: 1.75rem;
-  }
+    .name {
+      width: 85%;
+      min-width: 0;
 
-  .tags {
-    display: flex;
-    gap: 5px;
+      .editable-text__label {
+      }
+    }
 
     .user-popover {
-      margin-right: 5px;
-    }
+      height: 22px;
+      width: 22px;
 
-    .tag {
-      font-size: 10px;
-    }
-  }
-
-  .priority {
-    height: 25px;
-    width: 25px;
-
-    position: absolute;
-    top: 10px;
-    right: 5px;
-
-    &.medium {
-      color: #0061CF;
-    }
-
-    &.high {
-      color: #F59E0B;
-    }
-
-    &.urgent {
-      color: #EF4444;
+      .trigger {
+        height: 22px;
+        width: 22px;
+      }
     }
   }
 
-  .code-name {
+  .details {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 5px;
+
+    .date {
+      font-size: 12px;
+      color: #5a5a5a;
+    }
+
+    .priority {
+      display: flex;
+      font-size: 12px;
+
+      .icon {
+        width: 18px;
+        height: 18px;
+      }
+
+      &.medium {
+        color: #0061CF;
+      }
+
+      &.high {
+        color: #F59E0B;
+      }
+
+      &.urgent {
+        color: #EF4444;
+      }
+    }
+  }
+
+  .code-prefix {
     position: absolute;
-    bottom: 8px;
+    bottom: 7px;
     right: 10px;
 
     color: #5a5a5a;
+  }
+
+  .tags {
+    width: 75%;
+    position: absolute;
+    bottom: -10px;
+    display: flex;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+
+    > * {
+      flex: none;
+    }
+
+    .tag-more {
+      background-color: #262626;
+      padding: 0 8px;
+      border-radius: 5px;
+    }
+
+    .tags-measure {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: max-content;
+      height: 0;
+      overflow: hidden;
+      visibility: hidden;
+      pointer-events: none;
+      display: flex;
+      gap: 6px;
+    }
+  }
+
+  &:has(.tags) {
+    margin-bottom: 15px;
   }
 }
