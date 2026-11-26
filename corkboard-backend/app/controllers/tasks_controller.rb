@@ -108,6 +108,26 @@ class TasksController < ApplicationController
     render json: { task: @task.as_broadcast }, status: :ok
   end
 
+  def update_blocked
+    ids = Array(update_params[:blocked_by_ids]).map(&:to_s).uniq - [@task.id.to_s]
+
+    blockers = Task.where(workspace_id: @task.workspace_id, id: ids)
+    raise ActiveRecord::RecordNotFound if blockers.size != ids.size
+
+    current_ids = @task.blocked_tasks.pluck(:blocked_by_task_id).map(&:to_s)
+    @task.blocked_tasks.where(blocked_by_task_id: current_ids - ids).destroy_all
+
+    (ids - current_ids).each do |id|
+      @task.blocked_tasks.create!(blocked_by_task_id: id)
+    end
+
+    if @task.release_id.present?
+      ReleaseBroadcaster.broadcast(@task.release_id, "update_task", task: @task.as_broadcast)
+    else
+      WorkspaceBroadcaster.broadcast(@task.workspace_id, "update_backlog_task", task: @task.as_broadcast)
+    end
+  end
+
   def destroy
     release_id, workspace_id = @task.release_id, @task.workspace_id
     @task.destroy!
@@ -135,9 +155,13 @@ class TasksController < ApplicationController
 
   private
 
-  UPDATE_PARAMS = [:name, :priority, :start_date, :due_date, :user_id]
+  UPDATE_PARAMS = [:name, :priority, :start_date, :due_date, :user_id, blocked_by_ids: []]
   MOVE_PARAMS   = [:status, :position, :release_id]
   ALLOWED_PARAMS = UPDATE_PARAMS + MOVE_PARAMS + [:release_id, :workspace_id]
+
+  def update_params
+    params.permit(*UPDATE_PARAMS)
+  end
 
   def tasks_params
     params.permit(ALLOWED_PARAMS)

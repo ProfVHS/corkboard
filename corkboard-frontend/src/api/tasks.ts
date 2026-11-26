@@ -46,6 +46,11 @@ const tasksApi = {
             .then((response) => onSuccess(response.data))
             .catch(onError);
     },
+    updateBlocked: (taskId: string, blocked_by_ids: string[], onSuccess: (response: any) => void, onError?: (error: unknown) => void) => {
+        api.put(`/tasks/${taskId}/update_blocked`, { blocked_by_ids })
+            .then((response) => onSuccess(response.data))
+            .catch(onError);
+    },
 };
 
 export default tasksApi;

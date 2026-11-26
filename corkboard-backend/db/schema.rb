@@ -10,11 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_31_115204) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_25_211340) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "blocked_tasks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "blocked_by_task_id", null: false
+    t.datetime "created_at", null: false
+    t.uuid "task_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blocked_by_task_id"], name: "index_blocked_tasks_on_blocked_by_task_id"
+    t.index ["task_id", "blocked_by_task_id"], name: "index_blocked_tasks_on_task_id_and_blocked_by_task_id", unique: true
+    t.index ["task_id"], name: "index_blocked_tasks_on_task_id"
+    t.check_constraint "task_id <> blocked_by_task_id", name: "check_task_not_blocking_itself"
+  end
 
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.jsonb "content"
@@ -143,6 +154,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_115204) do
     t.index ["slug"], name: "index_workspaces_on_slug", unique: true
   end
 
+  add_foreign_key "blocked_tasks", "tasks"
+  add_foreign_key "blocked_tasks", "tasks", column: "blocked_by_task_id"
   add_foreign_key "documents", "tasks", on_delete: :nullify
   add_foreign_key "documents", "users", column: "owner_id", on_delete: :cascade
   add_foreign_key "documents", "workspaces", on_delete: :cascade

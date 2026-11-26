@@ -41,6 +41,11 @@ class Task < ApplicationRecord
   has_many :tags, through: :tasks_tags
   has_one :document, dependent: :destroy
 
+  has_many :blocked_tasks, dependent: :destroy
+  has_many :blocked_by, through: :blocked_tasks, source: :blocked_by_task
+  has_many :inverse_blocked_tasks, class_name: "BlockedTask", foreign_key: :blocked_by_task_id, dependent: :destroy
+  has_many :blocking, through: :inverse_blocked_tasks, source: :task
+
   validates :code_name, presence: true, uniqueness: { scope: :workspace_id }
 
   before_validation :generate_code_name, on: :create
@@ -84,6 +89,7 @@ class Task < ApplicationRecord
       release_id: release_id,
       workspace_id: workspace_id,
       tags: tag_ids,
+      blocked_by: blocked_by,
       user: user && { id: user.id, username: user.username }
     }
   end

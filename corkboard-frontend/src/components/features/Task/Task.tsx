@@ -17,6 +17,9 @@ import { useTaskTags } from "@/query/useTags.ts";
 import dayjs from "dayjs";
 import classNames from "classnames";
 import TagList from "@/features/Task/TagList.tsx";
+import Modal from "@/ui/Modal/Modal.tsx";
+import { Button } from "@/ui/Button/Button.tsx";
+import { DependencySelect } from "@/features/Task/Select.tsx";
 
 type TaskProps = {
     task: TaskType;
@@ -28,8 +31,9 @@ type Inputs = {
 
 export const Task = memo(({ task }: TaskProps) => {
     const taskId = task.id;
-    const [isEditing, setIsEditing] = useState(false);
-    const [isDragging, setIsDragging] = useState(false);
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [showBlockModal, setShowBlockModal] = useState<boolean>(false);
     const ref = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
     const commitRef = useRef<() => void>(() => {});
@@ -45,6 +49,7 @@ export const Task = memo(({ task }: TaskProps) => {
     const { data: currentRelease } = useCurrentRelease(workspace?.id);
     const { data: nextRelease } = useNextRelease(workspace?.id);
     const { data: tags = [] } = useTaskTags(task.tags);
+    const [dependencyIds, setDependencyIds] = useState<string[]>([]);
 
     commitRef.current = () => {
         const name = (getValues("name") ?? "").trim();
@@ -57,6 +62,12 @@ export const Task = memo(({ task }: TaskProps) => {
 
         tasksApi.update(taskId, { name }, () => {
             setIsEditing(false);
+        });
+    };
+
+    const handleBlockTask = () => {
+        tasksApi.updateBlocked(taskId, dependencyIds, () => {
+            setShowBlockModal(false);
         });
     };
 
@@ -99,6 +110,7 @@ export const Task = memo(({ task }: TaskProps) => {
             [
                 { type: "button", label: "Rename", icon: "edit", onClick: () => setIsEditing(true) },
                 { type: "hr" },
+                { type: "button", label: "Block", icon: "lock", onClick: () => setShowBlockModal(true) },
                 task.status === "backlog" &&
                     currentRelease && {
                         type: "button",
@@ -157,6 +169,7 @@ export const Task = memo(({ task }: TaskProps) => {
                             }}
                         />
                     </div>
+                    {task.blocked_by?.length > 0 && <Icon icon="lock" className="lock" />}
                     <UserPopover taskId={taskId} taskUser={task.user} />
                 </div>
 
@@ -173,40 +186,22 @@ export const Task = memo(({ task }: TaskProps) => {
                 {workspace?.code_prefix_enabled && <div className="code-prefix">{task.code_name}</div>}
 
                 {user?.preferences.show_board_tags && <TagList tags={tags} />}
-
-                {/*<form className="task__header" ref={headerRef} onClick={(e) => isEditing && e.stopPropagation()} onSubmit={handleSubmit(onSubmit)}>*/}
-                {/*    <EditableText*/}
-                {/*        isEditable={isEditing}*/}
-                {/*        value={task.name}*/}
-                {/*        register={register("name", {*/}
-                {/*            required: "You have to enter a name!",*/}
-                {/*        })}*/}
-                {/*    />*/}
-                {/*    {isEditing && (*/}
-                {/*        <Button type="submit" size="small" color="primary">*/}
-                {/*            Save*/}
-                {/*        </Button>*/}
-                {/*    )}*/}
-                {/*</form>*/}
-                {/*<div className="tags">*/}
-                {/*    <UserPopover taskId={taskId} taskUser={task.user} />*/}
-
-                {/*    {user?.preferences.show_board_tags && (*/}
-                {/*        <>*/}
-                {/*            {tags.slice(0, 3).map((tag) => (*/}
-                {/*                <Tag key={tag.id} tag={tag} />*/}
-                {/*            ))}*/}
-                {/*            {tags.length > 3 && (*/}
-                {/*                <div className="tag">*/}
-                {/*                    <span>+{tags.length - 3}</span>*/}
-                {/*                </div>*/}
-                {/*            )}*/}
-                {/*        </>*/}
-                {/*    )}*/}
-                {/*</div>*/}
-                {/*{workspace?.code_prefix_enabled && <div className="code-name">{task.code_name}</div>}*/}
-                {/*{task.priority && <Icon className={`${task.priority} priority`} icon="priority" />}*/}
             </div>
+            {showBlockModal && (
+                <Modal className="block-modal" onClose={() => setShowBlockModal(false)}>
+                    <Modal.Header title="Block task" />
+                    <Modal.Body>
+                        <span>Select a task that must be completed before this one can start</span>
+                        <DependencySelect taskId={taskId} value={dependencyIds} onChange={setDependencyIds} />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={handleBlockTask}>Block task</Button>
+                        <Button color="secondary" onClick={() => setShowBlockModal(false)}>
+                            Cancel
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            )}
         </ContextMenu>
     );
 });

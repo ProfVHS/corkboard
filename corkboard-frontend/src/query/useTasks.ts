@@ -96,3 +96,36 @@ export function useTask(taskId: string) {
         }),
     });
 }
+
+const mergeTasks = (results: { data?: TaskType[] }[]) => {
+    const map = new Map<string, TaskType>();
+    for (const r of results) r.data?.forEach((t) => map.set(t.id, t)); // deduplikacja po id
+    return {
+        tasks: [...map.values()],
+        isLoading: results.some((r: any) => r.isLoading),
+    };
+};
+
+export function useAllTasks() {
+    const workspaceId = useWorkspaceStore((s) => s.workspace?.id);
+    const { data: currentRelease } = useCurrentRelease(workspaceId);
+    const releaseId = currentRelease?.id;
+
+    return useQueries({
+        queries: [
+            {
+                queryKey: taskKeys.board(releaseId),
+                queryFn: () => fetchBoard(releaseId),
+                enabled: !!releaseId,
+                staleTime: 5 * 60 * 1000,
+            },
+            {
+                queryKey: taskKeys.backlog(workspaceId),
+                queryFn: () => fetchBacklog(workspaceId),
+                enabled: !!workspaceId,
+                staleTime: 5 * 60 * 1000,
+            },
+        ],
+        combine: mergeTasks,
+    });
+}

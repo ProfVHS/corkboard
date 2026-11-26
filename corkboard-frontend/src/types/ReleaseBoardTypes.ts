@@ -15,6 +15,7 @@ export type TaskType = {
     tags: string[];
     start_date: string | null;
     due_date: string | null;
+    blocked_by: string[];
 };
 
 export type Column = {
