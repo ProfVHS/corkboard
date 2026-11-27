@@ -66,9 +66,24 @@ export const Task = memo(({ task }: TaskProps) => {
     };
 
     const handleBlockTask = () => {
-        tasksApi.block(taskId, dependencyIds, () => {
+        const currentIds = task.blocked_by.map((b) => b.id);
+
+        const toAdd = dependencyIds.filter((id) => !currentIds.includes(id));
+        const toRemove = currentIds.filter((id) => !dependencyIds.includes(id));
+
+        if (toAdd.length === 0 && toRemove.length === 0) {
             setShowBlockModal(false);
-        });
+            return;
+        }
+
+        let pending = (toAdd.length > 0 ? 1 : 0) + (toRemove.length > 0 ? 1 : 0);
+        const done = () => {
+            pending -= 1;
+            if (pending === 0) setShowBlockModal(false);
+        };
+
+        if (toAdd.length > 0) tasksApi.block(taskId, toAdd, done);
+        if (toRemove.length > 0) tasksApi.unblock(taskId, toRemove, done);
     };
 
     useEffect(() => {
