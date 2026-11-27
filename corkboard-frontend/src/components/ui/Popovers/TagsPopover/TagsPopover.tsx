@@ -25,8 +25,6 @@ const TagsPopover = ({ taskId }: TagsPopoverProps) => {
     const { updateTask } = useTasksCache();
     const { addTag } = useTagsCache(workspaceId);
 
-    console.log(task);
-
     const tagIds = task?.tags ?? [];
     const taskTags = allTags.filter((t) => tagIds.includes(t.id));
     const availableTags = allTags.filter((t) => !tagIds.includes(t.id));

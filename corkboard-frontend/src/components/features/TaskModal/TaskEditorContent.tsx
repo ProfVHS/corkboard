@@ -4,18 +4,17 @@ import { useAuth } from "@/context/auth/useAuth.ts";
 import { CollaborativeEditor } from "../CollaborativeEditor/CollaborativeEditor.tsx";
 import Loading from "@/ui/Loading/Loading.tsx";
 import TaskProperties from "../TaskProperties/TaskProperties.tsx";
-import { useTask } from "@/query/useTasks.ts";
 import { useEffect, useState } from "react";
 import tasksApi from "@/api/tasks.ts";
+import type { TaskType } from "@/types/ReleaseBoardTypes.ts";
 
 interface TaskEditorContentProps {
-    taskId: string;
+    task: TaskType;
     className?: string;
 }
 
-export const TaskEditorContent = ({ taskId, className }: TaskEditorContentProps) => {
+export const TaskEditorContent = ({ task, className }: TaskEditorContentProps) => {
     const { user, token } = useAuth();
-    const { task } = useTask(taskId);
 
     const [documentId, setDocumentId] = useState<string | null>(null);
     const [isDocumentReady, setIsDocumentReady] = useState(false);
@@ -29,13 +28,13 @@ export const TaskEditorContent = ({ taskId, className }: TaskEditorContentProps)
         if (!trimmed || !task || task.name === trimmed) return;
 
         if (task && task.name !== trimmed) {
-            tasksApi.update(taskId, { name: trimmed }, () => {});
+            tasksApi.update(task.id, { name: trimmed }, () => {});
         }
     };
 
     useEffect(() => {
-        tasksApi.getDocument(taskId, (response) => setDocumentId(response.id));
-    }, [taskId]);
+        tasksApi.getDocument(task.id, (response) => setDocumentId(response.id));
+    }, [task.id]);
 
     if (!task) return null;
 

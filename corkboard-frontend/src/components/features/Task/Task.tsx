@@ -66,7 +66,7 @@ export const Task = memo(({ task }: TaskProps) => {
     };
 
     const handleBlockTask = () => {
-        tasksApi.updateBlocked(taskId, dependencyIds, () => {
+        tasksApi.block(taskId, dependencyIds, () => {
             setShowBlockModal(false);
         });
     };
@@ -111,6 +111,15 @@ export const Task = memo(({ task }: TaskProps) => {
                 { type: "button", label: "Rename", icon: "edit", onClick: () => setIsEditing(true) },
                 { type: "hr" },
                 { type: "button", label: "Block", icon: "lock", onClick: () => setShowBlockModal(true) },
+                task.blocked_by?.length > 0 && {
+                    type: "button",
+                    label: "Unblock",
+                    icon: "unlock",
+                    onClick: () => {
+                        setTaskId(taskId);
+                        setIsOpen(true);
+                    },
+                },
                 task.status === "backlog" &&
                     currentRelease && {
                         type: "button",
@@ -139,7 +148,7 @@ export const Task = memo(({ task }: TaskProps) => {
                     onClick: () => tasksApi.delete(taskId, () => {}),
                 },
             ].filter(Boolean) as ContextMenuItem[],
-        [currentRelease, nextRelease, task.status, taskId],
+        [task.blocked_by?.length, task.status, currentRelease, nextRelease, setTaskId, taskId, setIsOpen],
     );
 
     return (

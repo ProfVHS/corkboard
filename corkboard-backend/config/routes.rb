@@ -33,7 +33,8 @@ Rails.application.routes.draw do
     member do
       put :move_to_next_release
       put :move
-      put :update_blocked
+      put :block
+      delete :unblock
     end
     resources :tags, only: [] do
       member do

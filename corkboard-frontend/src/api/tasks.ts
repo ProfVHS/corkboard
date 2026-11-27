@@ -46,8 +46,13 @@ const tasksApi = {
             .then((response) => onSuccess(response.data))
             .catch(onError);
     },
-    updateBlocked: (taskId: string, blocked_by_ids: string[], onSuccess: (response: any) => void, onError?: (error: unknown) => void) => {
-        api.put(`/tasks/${taskId}/update_blocked`, { blocked_by_ids })
+    block: (taskId: string, blocked_by_ids: string[], onSuccess: (response: any) => void, onError?: (error: unknown) => void) => {
+        api.put(`/tasks/${taskId}/block`, { blocked_by_ids })
+            .then((response) => onSuccess(response.data))
+            .catch(onError);
+    },
+    unblock: (taskId: string, blocked_by_ids: string[], onSuccess: (response: any) => void, onError?: (error: unknown) => void) => {
+        api.delete(`/tasks/${taskId}/unblock`, { params: { blocked_by_ids } })
             .then((response) => onSuccess(response.data))
             .catch(onError);
     },

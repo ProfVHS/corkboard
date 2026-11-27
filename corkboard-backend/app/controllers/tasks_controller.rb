@@ -108,18 +108,28 @@ class TasksController < ApplicationController
     render json: { task: @task.as_broadcast }, status: :ok
   end
 
-  def update_blocked
+  def block
     ids = Array(update_params[:blocked_by_ids]).map(&:to_s).uniq - [@task.id.to_s]
-
     blockers = Task.where(workspace_id: @task.workspace_id, id: ids)
     raise ActiveRecord::RecordNotFound if blockers.size != ids.size
 
-    current_ids = @task.blocked_tasks.pluck(:blocked_by_task_id).map(&:to_s)
-    @task.blocked_tasks.where(blocked_by_task_id: current_ids - ids).destroy_all
+    existing = @task.blocked_tasks.pluck(:blocked_by_task_id).map(&:to_s)
 
-    (ids - current_ids).each do |id|
+    (blockers.map { |t| t.id.to_s } - existing).each do |id|
       @task.blocked_tasks.create!(blocked_by_task_id: id)
     end
+
+    if @task.release_id.present?
+      ReleaseBroadcaster.broadcast(@task.release_id, "update_task", task: @task.as_broadcast)
+    else
+      WorkspaceBroadcaster.broadcast(@task.workspace_id, "update_backlog_task", task: @task.as_broadcast)
+    end
+  end
+
+  def unblock
+    ids = Array(update_params[:blocked_by_ids]).map(&:to_s).uniq - [@task.id.to_s]
+
+    @task.blocked_tasks.where(blocked_by_task_id: ids).destroy_all
 
     if @task.release_id.present?
       ReleaseBroadcaster.broadcast(@task.release_id, "update_task", task: @task.as_broadcast)

@@ -1,0 +1,130 @@
+.blocked {
+  &-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &-container {
+    width: 60%;
+    height: 70%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    border-radius: 10px;
+
+    background-color: #101013;
+
+    .content {
+      height: 85%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 15px;
+      padding: 30px 0;
+
+      .icon-box {
+        border: 2px solid #00699D;
+        background-color: rgba(#00699D, 0.1);
+        border-radius: 8px;
+        padding: 5px;
+      }
+
+      .icon {
+        width: 25px;
+        height: 25px;
+        color: #19b2fb;
+      }
+
+      .title {
+        color: #ffffff;
+        font-size: 20px;
+      }
+
+      .description {
+        width: 80%;
+        font-size: 12px;
+      }
+
+      .blockers {
+        width: 70%;
+        height: fit-content;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+
+        overflow-y: auto;
+
+        .blocker {
+          width: 70%;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 5px 10px;
+          border-radius: 5px;
+          background-color: #212126;
+
+          .code-name {
+            color: #19b2fb;
+          }
+
+          .name {
+            color: #ffffff;
+          }
+
+          .icons {
+            display: flex;
+            justify-content: end;
+            flex-grow: 1;
+            gap: 10px;
+
+            .icon {
+              width: 14px;
+              height: 14px;
+            }
+
+            .button__content {
+              padding: 2px;
+            }
+          }
+        }
+      }
+
+    }
+
+    .footer {
+      width: 100%;
+      display: flex;
+      justify-content: end;
+      margin-bottom: 20px;
+      padding: 0 20px;
+      gap: 10px;
+
+      .cancel {
+        background: none;
+        margin-right: auto;
+        color: #5a5a5a;
+
+        &:hover {
+          background-color: #1b1b1b;
+        }
+      }
+
+      .button {
+        min-width: unset;
+      }
+    }
+  }
+}
+
